@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --background: #faf6ee;
+  --background-soft: #f3ece0;
+  --foreground: #2b2620;
+  --muted: #746a5c;
+  --accent: #a8501f;
+  --accent-soft: #c97a4a;
+  --border: #e6dbc8;
+  --card: #fffdf8;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-soft: var(--background-soft);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --font-body: var(--font-vazirmatn);
+  --font-display: var(--font-naskh);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), sans-serif;
+}
+
+.prose-article {
+  line-height: 2.15;
+  font-size: 1.15rem;
+}
+
+.prose-article p {
+  margin-top: 0;
+  margin-bottom: 1.6em;
+}
+
+.prose-article h2 {
+  font-family: var(--font-display), serif;
+  font-size: 1.6rem;
+  margin-top: 2.2em;
+  margin-bottom: 0.8em;
+  color: var(--foreground);
+}
+
+.prose-article h3 {
+  font-family: var(--font-display), serif;
+  font-size: 1.3rem;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+}
+
+.prose-article blockquote {
+  border-inline-start: 3px solid var(--accent);
+  padding-inline-start: 1.2em;
+  margin: 1.8em 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.25rem;
+  color: var(--muted);
+}
+
+.prose-article a {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.prose-article ul,
+.prose-article ol {
+  margin-bottom: 1.6em;
+  padding-inline-start: 1.4em;
+}
+
+.prose-article li {
+  margin-bottom: 0.5em;
+}
