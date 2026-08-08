@@ -1,16 +1,17 @@
 import { notFound } from "next/navigation";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
+import Comments from "@/components/Comments";
 import Tag from "@/components/Tag";
-import { getAllArticles, getArticleBySlug } from "@/lib/articles";
+import { getArticleBySlug } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
+import { getCurrentUser } from "@/lib/auth";
 import { formatJalaliDate } from "@/lib/format";
 
-export function generateStaticParams() {
-  return getAllArticles().map((article) => ({ slug: article.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticleBySlug(decodeURIComponent(slug));
+  const article = await getArticleBySlug(decodeURIComponent(slug));
   if (!article) return {};
   return { title: article.title, description: article.excerpt };
 }
@@ -29,19 +30,22 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticleBySlug(decodeURIComponent(slug));
+  const article = await getArticleBySlug(decodeURIComponent(slug));
   if (!article) notFound();
 
-  const unlocked = article.premium ? await hasAccess(article.slug) : true;
+  const current = await getCurrentUser();
+  const unlocked = await hasAccess(current?.id ?? null, article);
 
   return (
     <Container narrow className="py-14">
       <article>
         <header className="mb-10 text-center">
           <div className="mb-4 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
-            <time>{formatJalaliDate(article.date)}</time>
+            <time>{formatJalaliDate(article.publishedAt)}</time>
             <span aria-hidden>·</span>
             <span>{article.readingMinutes} دقیقه مطالعه</span>
+            <span aria-hidden>·</span>
+            <span>{article.category}</span>
             {article.premium && <PremiumBadge />}
           </div>
           <h1 className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
@@ -57,12 +61,18 @@ export default async function ArticlePage({
         </header>
 
         <div className="prose-article">
-          <MDXRemote source={article.content} />
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
         </div>
 
         {article.premium && !unlocked && (
-          <PaywallGate priceIRR={article.priceIRR} priceUSD={article.priceUSD} />
+          <PaywallGate
+            priceIRR={article.priceIRR}
+            priceUSD={article.priceUSD}
+            isLoggedIn={Boolean(current)}
+          />
         )}
+
+        {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
       </article>
     </Container>
   );

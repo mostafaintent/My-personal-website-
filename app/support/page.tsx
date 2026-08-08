@@ -1,5 +1,8 @@
+import Link from "next/link";
 import Container from "@/components/Container";
 import { paymentProviders } from "@/lib/payments/providers";
+import { subscriptionPlans } from "@/lib/payments/plans";
+import { formatToman, formatUSD } from "@/lib/format";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata = {
@@ -21,6 +24,25 @@ export default function SupportPage() {
           این پروژه کمک می‌کند.
         </p>
       </div>
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2">
+        {subscriptionPlans.map((plan) => (
+          <div key={plan.id} className="rounded-xl border border-border bg-card p-6">
+            <p className="font-display font-semibold">{plan.label}</p>
+            <p className="mt-1 text-sm text-muted">{plan.description}</p>
+            <p className="mt-4 text-sm">
+              {formatToman(plan.priceIRR)} / {formatUSD(plan.priceUSD)}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-sm">
+        یا مقاله‌های ویژه را جدا جدا{" "}
+        <Link href="/checkout" className="text-accent hover:underline">
+          از این‌جا بخرید
+        </Link>
+        .
+      </p>
 
       <div className="mt-10 rounded-xl border border-border bg-card p-6">
         <h2 className="font-display mb-4 text-lg font-semibold">روش‌های پرداخت</h2>

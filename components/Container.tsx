@@ -5,16 +5,18 @@ export default function Container({
   children,
   className,
   narrow = false,
+  wide = false,
 }: {
   children: ReactNode;
   className?: string;
   narrow?: boolean;
+  wide?: boolean;
 }) {
   return (
     <div
       className={clsx(
         "mx-auto w-full px-6",
-        narrow ? "max-w-2xl" : "max-w-3xl",
+        wide ? "max-w-5xl" : narrow ? "max-w-2xl" : "max-w-3xl",
         className
       )}
     >

@@ -1,0 +1,40 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import Container from "@/components/Container";
+import { requireAdmin } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
+
+const NAV = [
+  { href: "/admin", label: "داشبورد" },
+  { href: "/admin/articles", label: "مقالات" },
+  { href: "/admin/comments", label: "نظرات" },
+  { href: "/admin/access", label: "دسترسی‌ها" },
+];
+
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  await requireAdmin();
+
+  return (
+    <Container className="py-14">
+      <div className="grid gap-10 sm:grid-cols-[1fr_200px]">
+        <div>{children}</div>
+        <nav className="order-first sm:order-last">
+          <p className="mb-3 text-xs font-medium text-muted">مدیریت</p>
+          <ul className="flex flex-col gap-1">
+            {NAV.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="block rounded-lg px-3 py-2 text-sm hover:bg-background-soft"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </Container>
+  );
+}

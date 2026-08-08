@@ -11,9 +11,11 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
       className="group block border-b border-border py-8 first:pt-0 last:border-b-0"
     >
       <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted">
-        <time>{formatJalaliDate(article.date)}</time>
+        <time>{formatJalaliDate(article.publishedAt)}</time>
         <span aria-hidden>·</span>
         <span>{article.readingMinutes} دقیقه مطالعه</span>
+        <span aria-hidden>·</span>
+        <span>{article.category}</span>
         {article.premium && <PremiumBadge />}
       </div>
       <h2 className="font-display text-2xl font-semibold text-foreground transition-colors group-hover:text-accent">
