@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ArticleRow } from "@/lib/types/database";
+import MarkdownEditor from "./MarkdownEditor";
 
 const CATEGORIES = ["یادداشت", "ادبیات", "فلسفه", "روان‌شناسی", "تاریخ", "عرفان", "ترجمه"];
 
@@ -15,9 +16,10 @@ export default function ArticleForm({
   error?: string;
 }) {
   const [premium, setPremium] = useState(defaultValues?.premium ?? false);
+  const [content, setContent] = useState(defaultValues?.content ?? "");
 
   return (
-    <form action={action} className="flex max-w-2xl flex-col gap-4">
+    <form action={action} className="flex max-w-3xl flex-col gap-4">
       {error && (
         <p className="rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-accent">
           {error}
@@ -56,16 +58,11 @@ export default function ArticleForm({
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        متن مقاله (فرمت Markdown)
-        <textarea
-          name="content"
-          required
-          rows={16}
-          defaultValue={defaultValues?.content}
-          className="rounded-lg border border-border bg-card px-4 py-2.5 font-mono text-sm outline-none focus:border-accent"
-        />
-      </label>
+      <div className="flex flex-col gap-1 text-sm">
+        <span>متن مقاله</span>
+        <MarkdownEditor value={content} onChange={setContent} />
+        <input type="hidden" name="content" value={content} />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1 text-sm">
