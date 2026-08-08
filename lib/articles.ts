@@ -32,6 +32,7 @@ export interface Article extends ArticleMeta {
 }
 
 function toMeta(row: ArticleRow): ArticleMeta {
+  const plainText = row.content.replace(/<[^>]*>/g, " ");
   return {
     id: row.id,
     slug: row.slug,
@@ -43,7 +44,7 @@ function toMeta(row: ArticleRow): ArticleMeta {
     priceUSD: row.price_usd ?? undefined,
     priceIRR: row.price_irr ?? undefined,
     publishedAt: row.published_at ?? row.created_at,
-    readingMinutes: Math.max(1, Math.round(readingTime(row.content).minutes)),
+    readingMinutes: Math.max(1, Math.round(readingTime(plainText).minutes)),
     coverImageUrl: row.cover_image_url,
   };
 }

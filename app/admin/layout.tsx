@@ -16,8 +16,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   await requireAdmin();
 
   return (
-    <Container className="py-14">
-      <div className="grid gap-10 sm:grid-cols-[1fr_200px]">
+    <Container wide className="py-14">
+      <div className="grid gap-10 sm:grid-cols-[1fr_180px]">
         <div>{children}</div>
         <nav className="order-first sm:order-last">
           <p className="mb-3 text-xs font-medium text-muted">مدیریت</p>

@@ -9,7 +9,7 @@ import type { ArticleCategory, ArticleStatus } from "@/lib/types/database";
 function readArticleForm(formData: FormData) {
   const premium = formData.get("premium") === "on";
   const tags = String(formData.get("tags") ?? "")
-    .split(",")
+    .split(/[,،]/)
     .map((t) => t.trim())
     .filter(Boolean);
 

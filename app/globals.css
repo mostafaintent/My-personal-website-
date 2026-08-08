@@ -3,8 +3,8 @@
 :root {
   --background: #faf6ee;
   --background-soft: #f3ece0;
-  --foreground: #2b2620;
-  --muted: #746a5c;
+  --foreground: #000000;
+  --muted: #46423c;
   --accent: #a8501f;
   --accent-soft: #c97a4a;
   --border: #e6dbc8;
@@ -24,6 +24,10 @@
   --font-display: var(--font-naskh);
 }
 
+html {
+  font-size: 118%;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -32,12 +36,21 @@ body {
 
 .prose-article {
   line-height: 2.15;
-  font-size: 1.15rem;
+  font-size: 1.2rem;
+  color: var(--foreground);
 }
 
 .prose-article p {
   margin-top: 0;
   margin-bottom: 1.6em;
+}
+
+.prose-article h1 {
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  margin-top: 1em;
+  margin-bottom: 0.6em;
+  color: var(--foreground);
 }
 
 .prose-article h2 {
@@ -77,4 +90,23 @@ body {
 
 .prose-article li {
   margin-bottom: 0.5em;
+}
+
+.prose-article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.8em 0;
+}
+
+.tiptap-editable {
+  line-height: 1.9;
+}
+
+.tiptap-editable p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: inline-start;
+  color: var(--muted);
+  pointer-events: none;
+  height: 0;
 }

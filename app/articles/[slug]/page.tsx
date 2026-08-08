@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import DOMPurify from "isomorphic-dompurify";
 import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
@@ -60,9 +59,14 @@ export default async function ArticlePage({
           )}
         </header>
 
-        <div className="prose-article">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
-        </div>
+        <div
+          className="prose-article"
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(article.content, {
+              ADD_ATTR: ["style", "target", "rel"],
+            }),
+          }}
+        />
 
         {article.premium && !unlocked && (
           <PaywallGate
