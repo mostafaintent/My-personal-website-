@@ -49,8 +49,19 @@ function toMeta(row: ArticleRow): ArticleMeta {
   };
 }
 
+function toArticle(row: ArticleRow): Article {
+  return { ...toMeta(row), content: row.content };
+}
+
 export interface PaginatedArticles {
   articles: ArticleMeta[];
+  total: number;
+  page: number;
+  perPage: number;
+}
+
+export interface PaginatedFullArticles {
+  articles: Article[];
   total: number;
   page: number;
   perPage: number;
@@ -66,6 +77,18 @@ export async function getAllArticles(page = 1, perPage = 5): Promise<PaginatedAr
     .order("published_at", { ascending: false })
     .range(from, from + perPage - 1);
   return { articles: (data ?? []).map(toMeta), total: count ?? 0, page, perPage };
+}
+
+export async function getAllArticlesFull(page = 1, perPage = 5): Promise<PaginatedFullArticles> {
+  const supabase = await createClient();
+  const from = (page - 1) * perPage;
+  const { data, count } = await supabase
+    .from("articles")
+    .select("*", { count: "exact" })
+    .eq("status", "published")
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+  return { articles: (data ?? []).map(toArticle), total: count ?? 0, page, perPage };
 }
 
 export async function getArticlesByCategory(
@@ -111,5 +134,5 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     .eq("status", "published")
     .maybeSingle();
   if (!data) return null;
-  return { ...toMeta(data), content: data.content };
+  return toArticle(data);
 }

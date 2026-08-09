@@ -1,9 +1,11 @@
 import Container from "@/components/Container";
-import ArticleCard from "@/components/ArticleCard";
+import ArticleFullCard from "@/components/ArticleFullCard";
 import Sidebar from "@/components/Sidebar";
 import Pagination from "@/components/Pagination";
-import { getAllArticles } from "@/lib/articles";
+import { getAllArticlesFull } from "@/lib/articles";
 import { getSiteSettings } from "@/lib/settings";
+import { getCurrentUser } from "@/lib/auth";
+import { hasAccess } from "@/lib/payments/access";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +16,11 @@ export default async function Home({
 }) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  const settings = await getSiteSettings();
-  const { articles, total, perPage } = await getAllArticles(page, settings.itemsPerPage);
+  const [settings, current] = await Promise.all([getSiteSettings(), getCurrentUser()]);
+  const { articles, total, perPage } = await getAllArticlesFull(page, settings.itemsPerPage);
+  const unlockedFlags = await Promise.all(
+    articles.map((article) => hasAccess(current?.id ?? null, article))
+  );
 
   return (
     <Container wide className="py-14">
@@ -25,8 +30,14 @@ export default async function Home({
         </div>
         <div>
           {articles.length > 0 ? (
-            articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
+            articles.map((article, i) => (
+              <ArticleFullCard
+                key={article.slug}
+                article={article}
+                authorName={settings.authorName}
+                unlocked={unlockedFlags[i]}
+                isLoggedIn={Boolean(current)}
+              />
             ))
           ) : (
             <p className="text-center text-muted">هنوز مقاله‌ای منتشر نشده.</p>
