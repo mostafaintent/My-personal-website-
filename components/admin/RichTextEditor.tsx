@@ -7,6 +7,7 @@ import { TextStyle, FontFamily, FontSize } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import TiptapImage from "@tiptap/extension-image";
+import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
   Bold,
@@ -18,6 +19,10 @@ import {
   Quote,
   Link as LinkIcon,
   Image as ImageIcon,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
   Undo,
   Redo,
 } from "lucide-react";
@@ -208,6 +213,37 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <div className="mx-1 h-6 w-px bg-border" />
 
+      <ToolbarButton
+        label="راست‌چین"
+        active={editor.isActive({ textAlign: "right" })}
+        onClick={() => editor.chain().focus().setTextAlign("right").run()}
+      >
+        <AlignRight size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        label="وسط‌چین"
+        active={editor.isActive({ textAlign: "center" })}
+        onClick={() => editor.chain().focus().setTextAlign("center").run()}
+      >
+        <AlignCenter size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        label="چپ‌چین"
+        active={editor.isActive({ textAlign: "left" })}
+        onClick={() => editor.chain().focus().setTextAlign("left").run()}
+      >
+        <AlignLeft size={16} />
+      </ToolbarButton>
+      <ToolbarButton
+        label="تراز (هم‌ترازی دو طرف)"
+        active={editor.isActive({ textAlign: "justify" })}
+        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+      >
+        <AlignJustify size={16} />
+      </ToolbarButton>
+
+      <div className="mx-1 h-6 w-px bg-border" />
+
       <ToolbarButton label="لینک" active={editor.isActive("link")} onClick={setLink}>
         <LinkIcon size={16} />
       </ToolbarButton>
@@ -259,6 +295,7 @@ export default function RichTextEditor({
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TiptapImage,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "متن مقاله را اینجا بنویسید..." }),
     ],
     content: initialContent,

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import Container from "@/components/Container";
 import { requireAdmin } from "@/lib/auth";
 
@@ -21,6 +22,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       <div className="grid gap-10 sm:grid-cols-[1fr_180px]">
         <div>{children}</div>
         <nav className="order-first sm:order-last">
+          <Link
+            href="/"
+            className="mb-6 flex items-center gap-1.5 text-sm text-muted transition-colors hover:text-accent"
+          >
+            <ArrowRight size={14} />
+            بازگشت به سایت
+          </Link>
           <p className="mb-3 text-xs font-medium text-muted">مدیریت</p>
           <ul className="flex flex-col gap-1">
             {NAV.map((item) => (

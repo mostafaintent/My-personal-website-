@@ -4,6 +4,7 @@ import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
 import Comments from "@/components/Comments";
 import ShareBar from "@/components/ShareBar";
+import Sidebar from "@/components/Sidebar";
 import Tag from "@/components/Tag";
 import { getArticleBySlug } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
@@ -37,46 +38,54 @@ export default async function ArticlePage({
   const unlocked = await hasAccess(current?.id ?? null, article);
 
   return (
-    <Container narrow className="py-14">
-      <article>
-        <header className="mb-10 text-center">
-          <div className="mb-4 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
-            <time>{formatJalaliDate(article.publishedAt)}</time>
-            <span aria-hidden>·</span>
-            <span>{article.readingMinutes} دقیقه مطالعه</span>
-            <span aria-hidden>·</span>
-            <span>{article.category}</span>
-            {article.premium && <PremiumBadge />}
-          </div>
-          <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-            {article.title}
-          </h1>
+    <Container wide className="py-14">
+      <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
+        <div className="order-last sm:order-none">
+          <Sidebar />
+        </div>
+
+        <article className="mx-auto w-full max-w-2xl">
+          <header className="mb-10 text-center">
+            <div className="mb-4 flex flex-wrap items-center justify-center gap-2 text-xs text-muted">
+              <time>{formatJalaliDate(article.publishedAt)}</time>
+              <span aria-hidden>·</span>
+              <span>{article.readingMinutes} دقیقه مطالعه</span>
+              <span aria-hidden>·</span>
+              <span>{article.category}</span>
+              {article.premium && <PremiumBadge />}
+            </div>
+            <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+              {article.title}
+            </h1>
+          </header>
+
+          <div
+            className="prose-article"
+            dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
+          />
+
+          {article.premium && !unlocked && (
+            <PaywallGate
+              priceIRR={article.priceIRR}
+              priceUSD={article.priceUSD}
+              isLoggedIn={Boolean(current)}
+            />
+          )}
+
+          <ShareBar path={`/articles/${encodeURIComponent(article.slug)}`} title={article.title} />
+
           {article.tags.length > 0 && (
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm">
+              <span className="text-muted">برچسب‌ها:</span>
               {article.tags.map((tag) => (
                 <Tag key={tag} label={tag} />
               ))}
             </div>
           )}
-        </header>
 
-        <div
-          className="prose-article"
-          dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
-        />
-
-        {article.premium && !unlocked && (
-          <PaywallGate
-            priceIRR={article.priceIRR}
-            priceUSD={article.priceUSD}
-            isLoggedIn={Boolean(current)}
-          />
-        )}
-
-        <ShareBar path={`/articles/${encodeURIComponent(article.slug)}`} title={article.title} />
-
-        {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
-      </article>
+          {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
+        </article>
+      </div>
     </Container>
   );
 }

@@ -38,6 +38,7 @@ export function sanitizeArticleHtml(html: string): string {
       "*": {
         "font-size": [/^\d+(?:px|rem|em)$/],
         "font-family": [/^[\w\s,'"()\-]+$/],
+        "text-align": [/^(left|right|center|justify)$/],
       },
     },
     allowedSchemes: ["http", "https", "mailto"],
