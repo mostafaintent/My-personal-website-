@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
-import type { FavoriteReadItem } from "@/lib/types/database";
 
 export async function updateSiteSettings(formData: FormData) {
   await requireAdmin();
@@ -13,11 +12,11 @@ export async function updateSiteSettings(formData: FormData) {
   const bio = String(formData.get("bio") ?? "").trim();
   const itemsPerPage = Math.max(1, Number(formData.get("itemsPerPage") ?? 5));
 
-  let favoriteReads: FavoriteReadItem[] = [];
+  let favoriteSlugs: string[] = [];
   try {
-    favoriteReads = JSON.parse(String(formData.get("favoriteReads") ?? "[]"));
+    favoriteSlugs = JSON.parse(String(formData.get("favoriteReads") ?? "[]"));
   } catch {
-    favoriteReads = [];
+    favoriteSlugs = [];
   }
 
   const supabase = await createClient();
@@ -27,7 +26,7 @@ export async function updateSiteSettings(formData: FormData) {
       site_name: siteName,
       bio,
       items_per_page: itemsPerPage,
-      favorite_reads: favoriteReads,
+      favorite_reads: favoriteSlugs,
       updated_at: new Date().toISOString(),
     })
     .eq("id", true);

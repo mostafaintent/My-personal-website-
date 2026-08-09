@@ -28,10 +28,10 @@ export default async function AdminSettingsPage({
         initialSiteName={settings.siteName}
         initialBio={settings.bio}
         initialItemsPerPage={settings.itemsPerPage}
-        initialFavoriteReads={settings.favoriteReads}
+        initialFavoriteSlugs={settings.favoriteSlugs}
         articles={(articles ?? []).map((a) => ({
+          slug: a.slug,
           title: a.title,
-          url: `/articles/${encodeURIComponent(a.slug)}`,
           imageUrl: a.cover_image_url ?? "",
         }))}
         error={error}

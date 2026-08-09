@@ -88,7 +88,7 @@ export type SiteSettingsRow = {
   site_name: string;
   bio: string;
   items_per_page: number;
-  favorite_reads: FavoriteReadItem[];
+  favorite_reads: string[];
   updated_at: string;
 };
 
