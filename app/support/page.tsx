@@ -12,7 +12,7 @@ export const metadata = {
 export default function SupportPage() {
   return (
     <Container narrow className="py-14">
-      <h1 className="font-display mb-6 text-3xl font-bold">حمایت از {siteConfig.name}</h1>
+      <h1 className="mb-6 text-3xl font-bold">حمایت از {siteConfig.name}</h1>
       <div className="prose-article">
         <p>
           بیشتر نوشته‌های این سایت رایگان هستند و همیشه رایگان خواهند ماند.
@@ -28,7 +28,7 @@ export default function SupportPage() {
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {subscriptionPlans.map((plan) => (
           <div key={plan.id} className="rounded-xl border border-border bg-card p-6">
-            <p className="font-display font-semibold">{plan.label}</p>
+            <p className="font-semibold">{plan.label}</p>
             <p className="mt-1 text-sm text-muted">{plan.description}</p>
             <p className="mt-4 text-sm">
               {formatToman(plan.priceIRR)} / {formatUSD(plan.priceUSD)}
@@ -45,7 +45,7 @@ export default function SupportPage() {
       </p>
 
       <div className="mt-10 rounded-xl border border-border bg-card p-6">
-        <h2 className="font-display mb-4 text-lg font-semibold">روش‌های پرداخت</h2>
+        <h2 className="mb-4 text-lg font-semibold">روش‌های پرداخت</h2>
         <ul className="space-y-4">
           {paymentProviders.map((provider) => (
             <li key={provider.id} className="flex items-start justify-between gap-4">

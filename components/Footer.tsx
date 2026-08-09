@@ -1,8 +1,10 @@
-import Link from "next/link";
 import { siteConfig } from "@/lib/site-config";
+import { getSiteSettings } from "@/lib/settings";
 import Container from "./Container";
 
-export default function Footer() {
+export default async function Footer() {
+  const settings = await getSiteSettings();
+
   return (
     <footer className="mt-24 border-t border-border py-10">
       <Container className="flex flex-col items-center gap-4 text-center text-sm text-muted">
@@ -17,12 +19,7 @@ export default function Footer() {
             </a>
           ))}
         </div>
-        <p>
-          {siteConfig.name} — تمام مقاله‌های رایگان اینجا با عشق نوشته می‌شن.{" "}
-          <Link href="/support" className="text-accent hover:underline">
-            حمایت از این پروژه
-          </Link>
-        </p>
+        <p>{settings.siteName} — تمام مقاله‌های رایگان اینجا با عشق نوشته می‌شن.</p>
       </Container>
     </footer>
   );

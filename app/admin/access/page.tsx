@@ -17,7 +17,7 @@ export default async function AdminAccessPage({
 
   return (
     <div>
-      <h1 className="font-display mb-4 text-3xl font-bold">اعطای دستی دسترسی</h1>
+      <h1 className="mb-4 text-3xl font-bold">اعطای دستی دسترسی</h1>
       <p className="mb-8 text-sm leading-7 text-muted">
         تا وقتی درگاه پرداخت واقعی وصل نشده، بعد از این‌که پول رو به‌صورت دستی
         (مثلاً کارت‌به‌کارت) دریافت کردید، از همین‌جا برای کاربر دسترسی فعال کنید.
@@ -36,7 +36,7 @@ export default async function AdminAccessPage({
 
       <div className="grid gap-8 sm:grid-cols-2">
         <form action={grantArticleAccess} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
-          <h2 className="font-display font-semibold">دسترسی به یک مقاله‌ی ویژه</h2>
+          <h2 className="font-semibold">دسترسی به یک مقاله‌ی ویژه</h2>
           <input
             name="email"
             type="email"
@@ -81,7 +81,7 @@ export default async function AdminAccessPage({
         </form>
 
         <form action={grantSubscription} className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6">
-          <h2 className="font-display font-semibold">اشتراک ماهانه/سالانه</h2>
+          <h2 className="font-semibold">اشتراک ماهانه/سالانه</h2>
           <input
             name="email"
             type="email"

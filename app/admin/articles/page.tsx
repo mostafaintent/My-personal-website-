@@ -15,7 +15,7 @@ export default async function AdminArticlesPage() {
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="font-display text-3xl font-bold">مقالات</h1>
+        <h1 className="text-3xl font-bold">مقالات</h1>
         <Link
           href="/admin/articles/new"
           className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90"

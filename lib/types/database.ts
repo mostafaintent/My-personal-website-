@@ -77,6 +77,21 @@ export type SubscriptionRow = {
   created_at: string;
 };
 
+export type FavoriteReadItem = {
+  title: string;
+  imageUrl: string;
+  url: string;
+};
+
+export type SiteSettingsRow = {
+  id: boolean;
+  site_name: string;
+  bio: string;
+  items_per_page: number;
+  favorite_reads: FavoriteReadItem[];
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -117,6 +132,12 @@ export type Database = {
           current_period_end: string;
         };
         Update: Partial<SubscriptionRow>;
+        Relationships: [];
+      };
+      site_settings: {
+        Row: SiteSettingsRow;
+        Insert: Partial<SiteSettingsRow>;
+        Update: Partial<SiteSettingsRow>;
         Relationships: [];
       };
     };

@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/articles", label: "مقالات" },
   { href: "/admin/comments", label: "نظرات" },
   { href: "/admin/access", label: "دسترسی‌ها" },
+  { href: "/admin/settings", label: "ظاهر سایت" },
 ];
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {

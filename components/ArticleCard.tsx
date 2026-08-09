@@ -18,7 +18,7 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
         <span>{article.category}</span>
         {article.premium && <PremiumBadge />}
       </div>
-      <h2 className="font-display text-2xl font-semibold text-foreground transition-colors group-hover:text-accent">
+      <h2 className="text-2xl font-semibold text-foreground transition-colors group-hover:text-accent">
         {article.title}
       </h2>
       <p className="mt-3 leading-8 text-muted">{article.excerpt}</p>

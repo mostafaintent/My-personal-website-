@@ -23,7 +23,7 @@ export default async function AdminCommentsPage() {
 
   return (
     <div>
-      <h1 className="font-display mb-8 text-3xl font-bold">نظرات</h1>
+      <h1 className="mb-8 text-3xl font-bold">نظرات</h1>
       <div className="divide-y divide-border overflow-hidden rounded-xl border border-border">
         {comments && comments.length > 0 ? (
           comments.map((c) => (

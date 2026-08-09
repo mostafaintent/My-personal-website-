@@ -28,7 +28,7 @@ export default async function Comments({
 
   return (
     <section className="mt-16">
-      <h2 className="font-display mb-6 text-xl font-bold">نظرات</h2>
+      <h2 className="mb-6 text-xl font-bold">نظرات</h2>
 
       {current ? (
         <form action={postWithIds} className="mb-8 flex flex-col gap-3">

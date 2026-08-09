@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Vazirmatn, Noto_Naskh_Arabic } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteSettings } from "@/lib/settings";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -16,13 +16,16 @@ const notoNaskh = Noto_Naskh_Arabic({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s — ${siteConfig.name}`,
-  },
-  description: siteConfig.description,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  return {
+    title: {
+      default: settings.siteName,
+      template: `%s — ${settings.siteName}`,
+    },
+    description: settings.bio,
+  };
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

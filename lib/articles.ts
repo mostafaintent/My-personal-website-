@@ -49,36 +49,57 @@ function toMeta(row: ArticleRow): ArticleMeta {
   };
 }
 
-export async function getAllArticles(): Promise<ArticleMeta[]> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("*")
-    .eq("status", "published")
-    .order("published_at", { ascending: false });
-  return (data ?? []).map(toMeta);
+export interface PaginatedArticles {
+  articles: ArticleMeta[];
+  total: number;
+  page: number;
+  perPage: number;
 }
 
-export async function getArticlesByCategory(category: string): Promise<ArticleMeta[]> {
+export async function getAllArticles(page = 1, perPage = 5): Promise<PaginatedArticles> {
   const supabase = await createClient();
-  const { data } = await supabase
+  const from = (page - 1) * perPage;
+  const { data, count } = await supabase
     .from("articles")
-    .select("*")
+    .select("*", { count: "exact" })
+    .eq("status", "published")
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+  return { articles: (data ?? []).map(toMeta), total: count ?? 0, page, perPage };
+}
+
+export async function getArticlesByCategory(
+  category: string,
+  page = 1,
+  perPage = 5
+): Promise<PaginatedArticles> {
+  const supabase = await createClient();
+  const from = (page - 1) * perPage;
+  const { data, count } = await supabase
+    .from("articles")
+    .select("*", { count: "exact" })
     .eq("status", "published")
     .eq("category", category as ArticleCategory)
-    .order("published_at", { ascending: false });
-  return (data ?? []).map(toMeta);
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+  return { articles: (data ?? []).map(toMeta), total: count ?? 0, page, perPage };
 }
 
-export async function searchArticles(query: string): Promise<ArticleMeta[]> {
+export async function searchArticles(
+  query: string,
+  page = 1,
+  perPage = 5
+): Promise<PaginatedArticles> {
   const supabase = await createClient();
-  const { data } = await supabase
+  const from = (page - 1) * perPage;
+  const { data, count } = await supabase
     .from("articles")
-    .select("*")
+    .select("*", { count: "exact" })
     .eq("status", "published")
     .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
-    .order("published_at", { ascending: false });
-  return (data ?? []).map(toMeta);
+    .order("published_at", { ascending: false })
+    .range(from, from + perPage - 1);
+  return { articles: (data ?? []).map(toMeta), total: count ?? 0, page, perPage };
 }
 
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
@@ -91,16 +112,4 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     .maybeSingle();
   if (!data) return null;
   return { ...toMeta(data), content: data.content };
-}
-
-export async function getArchiveYears(): Promise<{ year: string; count: number }[]> {
-  const articles = await getAllArticles();
-  const counts = new Map<string, number>();
-  articles.forEach((a) => {
-    const year = new Date(a.publishedAt).toLocaleDateString("fa-IR-u-ca-persian", {
-      year: "numeric",
-    });
-    counts.set(year, (counts.get(year) ?? 0) + 1);
-  });
-  return Array.from(counts.entries()).map(([year, count]) => ({ year, count }));
 }

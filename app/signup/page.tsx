@@ -13,7 +13,7 @@ export default async function SignupPage({
 
   return (
     <Container narrow className="py-14">
-      <h1 className="font-display mb-8 text-3xl font-bold">ساخت حساب کاربری</h1>
+      <h1 className="mb-8 text-3xl font-bold">ساخت حساب کاربری</h1>
 
       {error && (
         <p className="mb-6 rounded-lg border border-accent/30 bg-accent/5 px-4 py-3 text-sm text-accent">

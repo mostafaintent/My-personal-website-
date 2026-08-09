@@ -24,7 +24,7 @@ export default async function EditArticlePage({
 
   return (
     <div>
-      <h1 className="font-display mb-8 text-3xl font-bold">ویرایش مقاله</h1>
+      <h1 className="mb-8 text-3xl font-bold">ویرایش مقاله</h1>
       <ArticleForm action={updateWithId} defaultValues={article} error={error} />
     </div>
   );

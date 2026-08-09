@@ -31,7 +31,7 @@ export default async function CheckoutPage() {
 
   return (
     <Container narrow className="py-14">
-      <h1 className="font-display mb-4 text-3xl font-bold">خرید مقاله‌های ویژه</h1>
+      <h1 className="mb-4 text-3xl font-bold">خرید مقاله‌های ویژه</h1>
       <p className="mb-8 text-sm leading-7 text-muted">
         می‌توانید چند مقاله را با هم انتخاب و یک‌جا پرداخت کنید — یا به‌جای خرید
         تک‌تک، یکی از طرح‌های اشتراک زیر را بردارید تا به همه‌ی محتوای ویژه
@@ -44,11 +44,11 @@ export default async function CheckoutPage() {
         <p className="text-muted">فعلاً مقاله‌ی ویژه‌ای برای خرید موجود نیست.</p>
       )}
 
-      <h2 className="font-display mt-14 mb-4 text-xl font-bold">یا با اشتراک</h2>
+      <h2 className="mt-14 mb-4 text-xl font-bold">یا با اشتراک</h2>
       <div className="grid gap-4 sm:grid-cols-2">
         {subscriptionPlans.map((plan) => (
           <div key={plan.id} className="rounded-xl border border-border bg-card p-6">
-            <p className="font-display font-semibold">{plan.label}</p>
+            <p className="font-semibold">{plan.label}</p>
             <p className="mt-1 text-sm text-muted">{plan.description}</p>
             <p className="mt-4 text-sm">
               {formatToman(plan.priceIRR)} / {formatUSD(plan.priceUSD)}

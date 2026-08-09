@@ -46,7 +46,7 @@ export default async function AccountPage() {
     <Container className="py-14">
       <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold">
+          <h1 className="text-2xl font-bold">
             {current.profile?.display_name ?? "کاربر"}
           </h1>
           <p className="text-sm text-muted">{current.email}</p>
@@ -64,7 +64,7 @@ export default async function AccountPage() {
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted">مقاله‌های خریداری‌شده</p>
-          <p className="font-display mt-1 text-2xl font-bold">
+          <p className="mt-1 text-2xl font-bold">
             {purchases?.length ?? 0} مقاله
           </p>
           <ul className="mt-4 space-y-2">
@@ -83,7 +83,7 @@ export default async function AccountPage() {
 
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted">وضعیت اشتراک</p>
-          <p className="font-display mt-1 text-2xl font-bold">
+          <p className="mt-1 text-2xl font-bold">
             {subscription
               ? subscription.plan === "monthly"
                 ? "اشتراک ماهانه فعال"
@@ -102,7 +102,7 @@ export default async function AccountPage() {
         </div>
       </div>
 
-      <h2 className="font-display mt-12 mb-4 text-xl font-bold">نظرات من</h2>
+      <h2 className="mt-12 mb-4 text-xl font-bold">نظرات من</h2>
       <div className="space-y-3">
         {comments && comments.length > 0 ? (
           comments.map((c) => (

@@ -16,7 +16,7 @@ export default function PaywallGate({
       <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
         <Lock size={20} />
       </div>
-      <h3 className="font-display text-xl font-semibold text-foreground">
+      <h3 className="text-xl font-semibold text-foreground">
         این محتوا ویژه است
       </h3>
       <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-muted">

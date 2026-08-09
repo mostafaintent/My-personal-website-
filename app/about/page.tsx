@@ -8,7 +8,7 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <Container narrow className="py-14">
-      <h1 className="font-display mb-8 text-3xl font-bold">درباره‌ی {siteConfig.authorName}</h1>
+      <h1 className="mb-8 text-3xl font-bold">درباره‌ی {siteConfig.authorName}</h1>
       <div className="prose-article">
         <p>{siteConfig.authorBio}</p>
         <p>

@@ -12,7 +12,7 @@ export default async function NewArticlePage({
 
   return (
     <div>
-      <h1 className="font-display mb-8 text-3xl font-bold">مقاله‌ی جدید</h1>
+      <h1 className="mb-8 text-3xl font-bold">مقاله‌ی جدید</h1>
       <ArticleForm action={createArticle} error={error} />
     </div>
   );

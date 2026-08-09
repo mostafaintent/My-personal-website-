@@ -13,7 +13,7 @@ export default async function LoginPage({
 
   return (
     <Container narrow className="py-14">
-      <h1 className="font-display mb-8 text-3xl font-bold">ورود به حساب</h1>
+      <h1 className="mb-8 text-3xl font-bold">ورود به حساب</h1>
 
       {message && (
         <p className="mb-6 rounded-lg border border-border bg-background-soft px-4 py-3 text-sm text-muted">

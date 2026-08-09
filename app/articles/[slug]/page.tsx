@@ -3,6 +3,7 @@ import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
 import Comments from "@/components/Comments";
+import ShareBar from "@/components/ShareBar";
 import Tag from "@/components/Tag";
 import { getArticleBySlug } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
@@ -47,7 +48,7 @@ export default async function ArticlePage({
             <span>{article.category}</span>
             {article.premium && <PremiumBadge />}
           </div>
-          <h1 className="font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
+          <h1 className="text-3xl font-bold leading-tight text-foreground sm:text-4xl">
             {article.title}
           </h1>
           {article.tags.length > 0 && (
@@ -71,6 +72,8 @@ export default async function ArticlePage({
             isLoggedIn={Boolean(current)}
           />
         )}
+
+        <ShareBar path={`/articles/${encodeURIComponent(article.slug)}`} title={article.title} />
 
         {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
       </article>
