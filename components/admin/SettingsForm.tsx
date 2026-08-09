@@ -143,7 +143,11 @@ export default function SettingsForm({
         <p className="mb-1 text-sm font-medium">بنر بالای سایت</p>
         <p className="mb-3 text-xs text-muted">
           یک عکس برای نوار بالای سایت آپلود کنید. اگه عکسی انتخاب نکنید، فقط
-          اسم سایت به‌صورت متن نشان داده می‌شه.
+          اسم سایت به‌صورت متن نشان داده می‌شه. برای اینکه بنر باریک و کشیده
+          دیده بشه (شبیه الگوی مرجع)، بهتره عکسی با اندازه‌ی تقریبی{" "}
+          <strong>۱۶۰۰ × ۲۰۰ پیکسل</strong> (پهن و کوتاه، نسبت حدود ۸ به ۱)
+          آماده و آپلود کنید. عکس‌های با نسبت دیگه هم کار می‌کنن ولی ممکنه از
+          بالا و پایین برش بخورن.
         </p>
         {bannerImageUrl && (
           <div className="relative mb-3 h-32 w-full overflow-hidden rounded-lg border border-border bg-background-soft">

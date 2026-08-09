@@ -23,12 +23,12 @@ export default async function Home({
   );
 
   return (
-    <Container wide className="py-14">
+    <Container wide className="pb-14">
       <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
         <div className="hidden min-w-0 sm:block">
           <Sidebar />
         </div>
-        <div>
+        <div className="pl-[1.5cm]">
           {articles.length > 0 ? (
             articles.map((article, i) => (
               <ArticleFullCard

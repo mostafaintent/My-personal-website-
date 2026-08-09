@@ -33,7 +33,7 @@ export default async function ArticlesPage({
         <div className="hidden min-w-0 sm:block">
           <Sidebar query={q} />
         </div>
-        <div>
+        <div className="pl-[1.5cm]">
           <h1 className="mb-10 text-3xl font-bold">{heading}</h1>
           {articles.length > 0 ? (
             articles.map((article) => (
