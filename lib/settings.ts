@@ -1,20 +1,27 @@
 import { createClient } from "@/lib/supabase/server";
 import type { FavoriteReadItem } from "@/lib/types/database";
+import { SHARE_LINK_OPTIONS } from "@/lib/share-links";
 
 export interface SiteSettings {
   siteName: string;
+  authorName: string;
   bio: string;
   itemsPerPage: number;
   favoriteReads: FavoriteReadItem[];
   favoriteSlugs: string[];
+  bannerImageUrl: string;
+  shareLinks: string[];
 }
 
 const DEFAULTS: SiteSettings = {
   siteName: "نام سایت",
+  authorName: "بهرام نصیری",
   bio: "خانه‌ای برای نوشتن آزاد — یادداشت‌ها، مقاله‌ها و ترجمه‌هایی درباره‌ی کتاب، فکر و زندگی.",
   itemsPerPage: 5,
   favoriteReads: [],
   favoriteSlugs: [],
+  bannerImageUrl: "",
+  shareLinks: SHARE_LINK_OPTIONS.map((o) => o.key),
 };
 
 // favorite_reads توی دیتابیس فقط یه آرایه از اسلاگه، نه عکس/عنوان — چون اگه
@@ -68,11 +75,18 @@ export async function getSiteSettings(): Promise<SiteSettings> {
       .filter((item): item is FavoriteReadItem => item !== null);
   }
 
+  const shareLinks = Array.isArray(data.share_links) && data.share_links.length > 0
+    ? data.share_links
+    : DEFAULTS.shareLinks;
+
   return {
     siteName: data.site_name || DEFAULTS.siteName,
+    authorName: data.author_name || DEFAULTS.authorName,
     bio: data.bio || DEFAULTS.bio,
     itemsPerPage: data.items_per_page || DEFAULTS.itemsPerPage,
     favoriteReads,
     favoriteSlugs,
+    bannerImageUrl: data.banner_image_url || "",
+    shareLinks,
   };
 }

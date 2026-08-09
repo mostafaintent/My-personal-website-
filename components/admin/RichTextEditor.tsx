@@ -25,8 +25,11 @@ import {
   AlignJustify,
   Undo,
   Redo,
+  Film,
+  FileText,
 } from "lucide-react";
 import { uploadArticleImage } from "@/lib/storage";
+import Embed from "@/lib/tiptap-embed";
 
 const FONT_FAMILIES = [
   { label: "پیش‌فرض", value: "" },
@@ -98,6 +101,24 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       return;
     }
     editor.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+  };
+
+  const insertVideo = () => {
+    const url = window.prompt(
+      "آدرس embed ویدیو را وارد کنید (مثلاً لینک embed یوتیوب یا آپارات):",
+      "https://"
+    );
+    if (!url) return;
+    editor.chain().focus().setEmbed({ src: url, mediaType: "video" }).run();
+  };
+
+  const insertPdf = () => {
+    const url = window.prompt(
+      "آدرس embed پی‌دی‌اف را وارد کنید (مثلاً لینک preview گوگل‌درایو):",
+      "https://"
+    );
+    if (!url) return;
+    editor.chain().focus().setEmbed({ src: url, mediaType: "pdf" }).run();
   };
 
   return (
@@ -277,6 +298,12 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         className="hidden"
         onChange={handleFileChange}
       />
+      <ToolbarButton label="افزودن ویدیو (با آدرس)" onClick={insertVideo}>
+        <Film size={16} />
+      </ToolbarButton>
+      <ToolbarButton label="افزودن پی‌دی‌اف (با آدرس)" onClick={insertPdf}>
+        <FileText size={16} />
+      </ToolbarButton>
 
       <div className="mx-1 h-6 w-px bg-border" />
 
@@ -316,6 +343,7 @@ export default function RichTextEditor({
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TiptapImage,
+      Embed,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "متن مقاله را اینجا بنویسید..." }),
     ],

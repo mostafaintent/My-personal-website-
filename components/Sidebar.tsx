@@ -92,16 +92,16 @@ export default async function Sidebar({ query }: { query?: string }) {
       {settings.favoriteReads.length > 0 && (
         <div>
           <p className="mb-3 font-semibold">برگزیده‌ها</p>
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-5">
             {settings.favoriteReads.map((item, i) => (
               <li key={i}>
-                <Link href={item.url} className="flex items-center gap-3 group">
+                <Link href={item.url} className="group block">
                   {item.imageUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={item.imageUrl}
                       alt=""
-                      className="h-12 w-12 shrink-0 rounded-md object-cover"
+                      className="mb-2 aspect-video w-full rounded-md object-cover"
                     />
                   )}
                   <span className="text-muted transition-colors group-hover:text-accent">

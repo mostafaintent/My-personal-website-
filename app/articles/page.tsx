@@ -30,13 +30,15 @@ export default async function ArticlesPage({
   return (
     <Container wide className="py-14">
       <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
-        <div className="order-last min-w-0 sm:order-none">
+        <div className="hidden min-w-0 sm:block">
           <Sidebar query={q} />
         </div>
         <div>
           <h1 className="mb-10 text-3xl font-bold">{heading}</h1>
           {articles.length > 0 ? (
-            articles.map((article) => <ArticleCard key={article.slug} article={article} />)
+            articles.map((article) => (
+              <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
+            ))
           ) : (
             <p className="text-muted">چیزی پیدا نشد.</p>
           )}

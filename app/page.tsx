@@ -20,12 +20,14 @@ export default async function Home({
   return (
     <Container wide className="py-14">
       <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
-        <div className="order-last min-w-0 sm:order-none">
+        <div className="hidden min-w-0 sm:block">
           <Sidebar />
         </div>
         <div>
           {articles.length > 0 ? (
-            articles.map((article) => <ArticleCard key={article.slug} article={article} />)
+            articles.map((article) => (
+              <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
+            ))
           ) : (
             <p className="text-center text-muted">هنوز مقاله‌ای منتشر نشده.</p>
           )}

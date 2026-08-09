@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { X, Plus } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { X, Plus, Upload } from "lucide-react";
+import { uploadSiteImage } from "@/lib/storage";
+import { SHARE_LINK_OPTIONS } from "@/lib/share-links";
 
 const MAX_FAVORITES = 5;
 
@@ -14,24 +16,34 @@ interface ArticleOption {
 export default function SettingsForm({
   action,
   initialSiteName,
+  initialAuthorName,
   initialBio,
   initialItemsPerPage,
   initialFavoriteSlugs,
+  initialBannerImageUrl,
+  initialShareLinks,
   articles,
   error,
   message,
 }: {
   action: (formData: FormData) => void;
   initialSiteName: string;
+  initialAuthorName: string;
   initialBio: string;
   initialItemsPerPage: number;
   initialFavoriteSlugs: string[];
+  initialBannerImageUrl: string;
+  initialShareLinks: string[];
   articles: ArticleOption[];
   error?: string;
   message?: string;
 }) {
   const [favoriteSlugs, setFavoriteSlugs] = useState<string[]>(initialFavoriteSlugs);
   const [query, setQuery] = useState("");
+  const [bannerImageUrl, setBannerImageUrl] = useState(initialBannerImageUrl);
+  const [bannerUploading, setBannerUploading] = useState(false);
+  const [shareLinks, setShareLinks] = useState<string[]>(initialShareLinks);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const bySlug = useMemo(() => new Map(articles.map((a) => [a.slug, a])), [articles]);
   const selectedSlugs = new Set(favoriteSlugs);
@@ -51,6 +63,27 @@ export default function SettingsForm({
 
   function removeItem(index: number) {
     setFavoriteSlugs((slugs) => slugs.filter((_, i) => i !== index));
+  }
+
+  function toggleShareLink(key: string) {
+    setShareLinks((links) =>
+      links.includes(key) ? links.filter((k) => k !== key) : [...links, key]
+    );
+  }
+
+  async function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBannerUploading(true);
+    try {
+      const url = await uploadSiteImage(file);
+      setBannerImageUrl(url);
+    } catch {
+      alert("آپلود عکس بنر ناموفق بود. دوباره امتحان کنید.");
+    } finally {
+      setBannerUploading(false);
+    }
   }
 
   return (
@@ -77,6 +110,15 @@ export default function SettingsForm({
       </label>
 
       <label className="flex flex-col gap-1 text-sm">
+        اسم نویسنده (زیر عنوان هر مقاله نشان داده می‌شود)
+        <input
+          name="authorName"
+          defaultValue={initialAuthorName}
+          className="rounded-lg border border-border bg-card px-4 py-2.5 outline-none focus:border-accent"
+        />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm">
         معرفی کوتاه (بالای ستون کناری نشان داده می‌شود)
         <textarea
           name="bio"
@@ -98,6 +140,69 @@ export default function SettingsForm({
       </label>
 
       <div>
+        <p className="mb-1 text-sm font-medium">بنر بالای سایت</p>
+        <p className="mb-3 text-xs text-muted">
+          یک عکس برای نوار بالای سایت آپلود کنید. اگه عکسی انتخاب نکنید، فقط
+          اسم سایت به‌صورت متن نشان داده می‌شه.
+        </p>
+        {bannerImageUrl && (
+          <div className="relative mb-3 h-32 w-full overflow-hidden rounded-lg border border-border bg-background-soft">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bannerImageUrl} alt="" className="h-full w-full object-cover" />
+            <button
+              type="button"
+              onClick={() => setBannerImageUrl("")}
+              className="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-foreground hover:text-accent"
+              aria-label="حذف بنر"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => bannerInputRef.current?.click()}
+          disabled={bannerUploading}
+          className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm hover:border-accent disabled:opacity-50"
+        >
+          <Upload size={14} />
+          {bannerUploading ? "در حال آپلود..." : bannerImageUrl ? "تغییر عکس بنر" : "آپلود عکس بنر"}
+        </button>
+        <input
+          ref={bannerInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleBannerChange}
+        />
+        <input type="hidden" name="bannerImageUrl" value={bannerImageUrl} />
+      </div>
+
+      <div>
+        <p className="mb-1 text-sm font-medium">لینک‌های اشتراک‌گذاری زیر مقاله</p>
+        <p className="mb-3 text-xs text-muted">
+          هر کدوم رو که می‌خواید کنار مقاله نشون داده بشه، تیک بزنید.
+        </p>
+        <div className="flex flex-wrap gap-3">
+          {SHARE_LINK_OPTIONS.map((opt) => (
+            <label
+              key={opt.key}
+              className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm"
+            >
+              <input
+                type="checkbox"
+                checked={shareLinks.includes(opt.key)}
+                onChange={() => toggleShareLink(opt.key)}
+                className="accent-accent"
+              />
+              {opt.label}
+            </label>
+          ))}
+        </div>
+        <input type="hidden" name="shareLinks" value={JSON.stringify(shareLinks)} />
+      </div>
+
+      <div>
         <p className="mb-1 text-sm font-medium">برگزیده‌ها (کنار سایدبار — حداکثر {MAX_FAVORITES} مورد)</p>
         <p className="mb-3 text-xs text-muted">
           عنوان یکی از مقاله‌های سایت را جست‌وجو کنید و از لیست انتخاب کنید. عکس و
@@ -106,15 +211,15 @@ export default function SettingsForm({
         </p>
 
         {favoriteSlugs.length > 0 && (
-          <ul className="mb-4 flex flex-col gap-2">
+          <ul className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {favoriteSlugs.map((slug, index) => {
               const article = bySlug.get(slug);
               return (
                 <li
                   key={slug}
-                  className="flex items-center gap-3 rounded-lg border border-border bg-card p-2"
+                  className="relative overflow-hidden rounded-lg border border-border bg-card"
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-background-soft">
+                  <div className="flex aspect-video w-full items-center justify-center overflow-hidden bg-background-soft">
                     {article?.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={article.imageUrl} alt="" className="h-full w-full object-cover" />
@@ -122,14 +227,14 @@ export default function SettingsForm({
                       <span className="text-[10px] text-muted">بدون عکس</span>
                     )}
                   </div>
-                  <span className="flex-1 text-sm">{article?.title ?? slug}</span>
+                  <p className="px-2 py-2 text-xs leading-5">{article?.title ?? slug}</p>
                   <button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="text-muted hover:text-accent"
+                    className="absolute left-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-card/90 text-muted hover:text-accent"
                     aria-label="حذف"
                   >
-                    <X size={16} />
+                    <X size={14} />
                   </button>
                 </li>
               );

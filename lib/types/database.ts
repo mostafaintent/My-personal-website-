@@ -86,9 +86,12 @@ export type FavoriteReadItem = {
 export type SiteSettingsRow = {
   id: boolean;
   site_name: string;
+  author_name: string;
   bio: string;
   items_per_page: number;
   favorite_reads: string[];
+  banner_image_url: string;
+  share_links: string[];
   updated_at: string;
 };
 

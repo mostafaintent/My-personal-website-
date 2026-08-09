@@ -26,9 +26,12 @@ export default async function AdminSettingsPage({
       <SettingsForm
         action={updateSiteSettings}
         initialSiteName={settings.siteName}
+        initialAuthorName={settings.authorName}
         initialBio={settings.bio}
         initialItemsPerPage={settings.itemsPerPage}
         initialFavoriteSlugs={settings.favoriteSlugs}
+        initialBannerImageUrl={settings.bannerImageUrl}
+        initialShareLinks={settings.shareLinks}
         articles={(articles ?? []).map((a) => ({
           slug: a.slug,
           title: a.title,

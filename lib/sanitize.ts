@@ -23,6 +23,8 @@ export function sanitizeArticleHtml(html: string): string {
       "pre",
       "hr",
       "span",
+      "div",
+      "iframe",
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
@@ -33,6 +35,10 @@ export function sanitizeArticleHtml(html: string): string {
       h2: ["style"],
       h3: ["style"],
       h4: ["style"],
+      div: ["data-embed-type", "class"],
+      // iframe فقط از سمت مدیر سایت (نویسنده) وارد محتوا می‌شه، نه کاربر عمومی —
+      // با این حال src رو به https محدود می‌کنیم تا خطر تزریق لینک ناامن کم بشه.
+      iframe: ["src", "allowfullscreen", "loading", "referrerpolicy"],
     },
     allowedStyles: {
       "*": {
@@ -43,5 +49,11 @@ export function sanitizeArticleHtml(html: string): string {
       },
     },
     allowedSchemes: ["http", "https", "mailto"],
+    allowedSchemesByTag: {
+      iframe: ["https"],
+    },
+    allowedClasses: {
+      div: ["embed-video", "embed-pdf"],
+    },
   });
 }
