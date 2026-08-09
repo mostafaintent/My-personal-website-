@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
 import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
@@ -9,6 +8,7 @@ import { getArticleBySlug } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
 import { getCurrentUser } from "@/lib/auth";
 import { formatJalaliDate } from "@/lib/format";
+import { sanitizeArticleHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -61,11 +61,7 @@ export default async function ArticlePage({
 
         <div
           className="prose-article"
-          dangerouslySetInnerHTML={{
-            __html: DOMPurify.sanitize(article.content, {
-              ADD_ATTR: ["style", "target", "rel"],
-            }),
-          }}
+          dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
         />
 
         {article.premium && !unlocked && (
