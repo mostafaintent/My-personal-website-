@@ -21,7 +21,7 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
       <h2 className="text-2xl font-semibold text-foreground transition-colors group-hover:text-accent">
         {article.title}
       </h2>
-      <p className="mt-3 leading-8 text-muted">{article.excerpt}</p>
+      {article.excerpt && <p className="mt-3 leading-8 text-muted">{article.excerpt}</p>}
       {article.tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {article.tags.map((tag) => (

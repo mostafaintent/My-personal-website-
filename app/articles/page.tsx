@@ -30,7 +30,7 @@ export default async function ArticlesPage({
   return (
     <Container wide className="py-14">
       <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
-        <div className="order-last sm:order-none">
+        <div className="order-last min-w-0 sm:order-none">
           <Sidebar query={q} />
         </div>
         <div>

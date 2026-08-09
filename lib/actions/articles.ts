@@ -6,31 +6,22 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import type { ArticleCategory, ArticleStatus } from "@/lib/types/database";
 
-function autoExcerpt(html: string): string {
-  const text = html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return text.length > 160 ? `${text.slice(0, 160)}…` : text;
-}
-
 function readArticleForm(formData: FormData) {
   const premium = formData.get("premium") === "on";
   const tags = String(formData.get("tags") ?? "")
     .split(/[,،]/)
     .map((t) => t.trim())
     .filter(Boolean);
-  const content = String(formData.get("content") ?? "");
-  const excerpt = String(formData.get("excerpt") ?? "").trim() || autoExcerpt(content);
 
   return {
     slug: String(formData.get("slug") ?? "").trim(),
     title: String(formData.get("title") ?? "").trim(),
-    excerpt,
-    content,
+    excerpt: String(formData.get("excerpt") ?? "").trim(),
+    content: String(formData.get("content") ?? ""),
     category: String(formData.get("category") ?? "یادداشت") as ArticleCategory,
     tags,
     premium,
+    cover_image_url: String(formData.get("coverImageUrl") ?? "").trim() || null,
     price_usd: premium && formData.get("priceUsd") ? Number(formData.get("priceUsd")) : null,
     price_irr: premium && formData.get("priceIrr") ? Number(formData.get("priceIrr")) : null,
     status: String(formData.get("status") ?? "draft") as ArticleStatus,

@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { X, Plus } from "lucide-react";
 import type { FavoriteReadItem } from "@/lib/types/database";
-import { uploadArticleImage } from "@/lib/storage";
+
+const MAX_FAVORITES = 5;
 
 export default function SettingsForm({
   action,
@@ -11,6 +12,7 @@ export default function SettingsForm({
   initialBio,
   initialItemsPerPage,
   initialFavoriteReads,
+  articles,
   error,
   message,
 }: {
@@ -19,26 +21,30 @@ export default function SettingsForm({
   initialBio: string;
   initialItemsPerPage: number;
   initialFavoriteReads: FavoriteReadItem[];
+  articles: FavoriteReadItem[];
   error?: string;
   message?: string;
 }) {
   const [favoriteReads, setFavoriteReads] = useState<FavoriteReadItem[]>(initialFavoriteReads);
+  const [query, setQuery] = useState("");
 
-  function updateItem(index: number, patch: Partial<FavoriteReadItem>) {
-    setFavoriteReads((items) => items.map((it, i) => (i === index ? { ...it, ...patch } : it)));
+  const selectedUrls = new Set(favoriteReads.map((f) => f.url));
+
+  const matches = useMemo(() => {
+    if (!query.trim()) return [];
+    const q = query.trim();
+    return articles.filter((a) => a.title.includes(q)).slice(0, 8);
+  }, [query, articles]);
+
+  function addItem(item: FavoriteReadItem) {
+    if (favoriteReads.length >= MAX_FAVORITES) return;
+    if (selectedUrls.has(item.url)) return;
+    setFavoriteReads((items) => [...items, item]);
+    setQuery("");
   }
 
   function removeItem(index: number) {
     setFavoriteReads((items) => items.filter((_, i) => i !== index));
-  }
-
-  async function handleImageUpload(index: number, file: File) {
-    try {
-      const url = await uploadArticleImage(file);
-      updateItem(index, { imageUrl: url });
-    } catch {
-      alert("آپلود عکس ناموفق بود.");
-    }
   }
 
   return (
@@ -86,61 +92,72 @@ export default function SettingsForm({
       </label>
 
       <div>
-        <p className="mb-2 text-sm font-medium">مطالب ویژه (کنار سایدبار)</p>
-        <div className="flex flex-col gap-3">
-          {favoriteReads.map((item, index) => (
-            <div key={index} className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-md bg-background-soft">
-                {item.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <span className="text-xs text-muted">بدون عکس</span>
-                )}
-              </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <input
-                  placeholder="عنوان"
-                  value={item.title}
-                  onChange={(e) => updateItem(index, { title: e.target.value })}
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
-                />
-                <input
-                  placeholder="آدرس لینک (مثلاً /articles/...)"
-                  value={item.url}
-                  onChange={(e) => updateItem(index, { url: e.target.value })}
-                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-accent"
-                  dir="ltr"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    e.target.value = "";
-                    if (file) handleImageUpload(index, file);
-                  }}
-                  className="text-xs"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() => removeItem(index)}
-                className="text-muted hover:text-accent"
-                aria-label="حذف"
+        <p className="mb-1 text-sm font-medium">برگزیده‌ها (کنار سایدبار — حداکثر {MAX_FAVORITES} مورد)</p>
+        <p className="mb-3 text-xs text-muted">
+          عنوان یکی از مقاله‌های سایت را جست‌وجو کنید و از لیست انتخاب کنید.
+        </p>
+
+        {favoriteReads.length > 0 && (
+          <ul className="mb-4 flex flex-col gap-2">
+            {favoriteReads.map((item, index) => (
+              <li
+                key={item.url}
+                className="flex items-center gap-3 rounded-lg border border-border bg-card p-2"
               >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => setFavoriteReads((items) => [...items, { title: "", imageUrl: "", url: "" }])}
-          className="mt-3 rounded-lg border border-border px-4 py-2 text-sm hover:border-accent hover:text-accent"
-        >
-          + افزودن مورد
-        </button>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-background-soft">
+                  {item.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-[10px] text-muted">بدون عکس</span>
+                  )}
+                </div>
+                <span className="flex-1 text-sm">{item.title}</span>
+                <button
+                  type="button"
+                  onClick={() => removeItem(index)}
+                  className="text-muted hover:text-accent"
+                  aria-label="حذف"
+                >
+                  <X size={16} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {favoriteReads.length < MAX_FAVORITES && (
+          <div>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="جست‌وجوی عنوان مقاله..."
+              className="w-full rounded-lg border border-border bg-card px-4 py-2.5 text-sm outline-none focus:border-accent"
+            />
+            {matches.length > 0 && (
+              <ul className="mt-2 flex flex-col gap-1 rounded-lg border border-border bg-card p-1">
+                {matches.map((a) => {
+                  const already = selectedUrls.has(a.url);
+                  return (
+                    <li key={a.url}>
+                      <button
+                        type="button"
+                        disabled={already}
+                        onClick={() => addItem(a)}
+                        className="flex w-full items-center gap-3 rounded-md px-2 py-2 text-start text-sm hover:bg-background-soft disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Plus size={14} className="shrink-0 text-accent" />
+                        <span className="flex-1">{a.title}</span>
+                        {already && <span className="text-xs text-muted">اضافه‌شده</span>}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
 
       <input type="hidden" name="favoriteReads" value={JSON.stringify(favoriteReads)} />

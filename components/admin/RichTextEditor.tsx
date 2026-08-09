@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { TextStyle, FontFamily, FontSize } from "@tiptap/extension-text-style";
+import { TextStyle, FontFamily, FontSize, LineHeight } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import TiptapImage from "@tiptap/extension-image";
@@ -36,6 +36,8 @@ const FONT_FAMILIES = [
 ];
 
 const FONT_SIZES = ["", "14px", "16px", "18px", "20px", "24px", "28px", "32px"];
+
+const LINE_HEIGHTS = ["", "1", "1.3", "1.5", "1.8", "2", "2.5"];
 
 function ToolbarButton({
   onClick,
@@ -152,6 +154,24 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         {FONT_SIZES.filter(Boolean).map((s) => (
           <option key={s} value={s}>
             {s.replace("px", "")}
+          </option>
+        ))}
+      </select>
+
+      <select
+        className="h-9 rounded-md border border-border bg-card px-2 text-sm"
+        title="فاصله‌ی خطوط"
+        value={(editor.getAttributes("textStyle").lineHeight as string) ?? ""}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (!value) editor.chain().focus().unsetLineHeight().run();
+          else editor.chain().focus().setLineHeight(value).run();
+        }}
+      >
+        <option value="">فاصله‌ی خط</option>
+        {LINE_HEIGHTS.filter(Boolean).map((h) => (
+          <option key={h} value={h}>
+            {h}
           </option>
         ))}
       </select>
@@ -292,6 +312,7 @@ export default function RichTextEditor({
       TextStyle,
       FontFamily,
       FontSize,
+      LineHeight,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       TiptapImage,
