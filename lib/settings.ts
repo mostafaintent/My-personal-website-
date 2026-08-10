@@ -6,6 +6,7 @@ export interface SiteSettings {
   siteName: string;
   authorName: string;
   bio: string;
+  bioEnabled: boolean;
   itemsPerPage: number;
   favoriteReads: FavoriteReadItem[];
   favoriteSlugs: string[];
@@ -19,6 +20,7 @@ const DEFAULTS: SiteSettings = {
   siteName: "نام سایت",
   authorName: "بهرام نصیری",
   bio: "خانه‌ای برای نوشتن آزاد — یادداشت‌ها، مقاله‌ها و ترجمه‌هایی درباره‌ی کتاب، فکر و زندگی.",
+  bioEnabled: false,
   itemsPerPage: 5,
   favoriteReads: [],
   favoriteSlugs: [],
@@ -95,6 +97,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     siteName: data.site_name || DEFAULTS.siteName,
     authorName: data.author_name || DEFAULTS.authorName,
     bio: data.bio || DEFAULTS.bio,
+    bioEnabled: Boolean(data.bio_enabled),
     itemsPerPage: data.items_per_page || DEFAULTS.itemsPerPage,
     favoriteReads,
     favoriteSlugs,

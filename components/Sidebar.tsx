@@ -34,10 +34,12 @@ export default async function Sidebar({ query }: { query?: string }) {
   });
 
   return (
-    <aside className="flex flex-col gap-8 text-sm">
-      {settings.bio && <p className="leading-7 text-muted">{settings.bio}</p>}
+    <aside className="flex flex-col gap-8 text-base">
+      {settings.bioEnabled && settings.bio && (
+        <p className="leading-7 text-muted">{settings.bio}</p>
+      )}
 
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-3">
         {NAV_LINKS.map((link) => (
           <Link key={link.href} href={link.href} className="text-foreground transition-colors hover:text-accent">
             {link.label}
@@ -60,8 +62,8 @@ export default async function Sidebar({ query }: { query?: string }) {
 
       {categoryCounts.size > 0 && (
         <div>
-          <p className="mb-3 font-semibold">دسته‌ها</p>
-          <ul className="flex flex-col gap-2">
+          <p className="mb-4 font-semibold">دسته‌ها</p>
+          <ul className="flex flex-col gap-3">
             {CATEGORIES.filter((c) => categoryCounts.has(c)).map((c) => (
               <li key={c}>
                 <Link
@@ -78,8 +80,8 @@ export default async function Sidebar({ query }: { query?: string }) {
 
       {yearCounts.size > 0 && (
         <div>
-          <p className="mb-3 font-semibold">بایگانی</p>
-          <ul className="flex flex-col gap-2">
+          <p className="mb-4 font-semibold">بایگانی</p>
+          <ul className="flex flex-col gap-3">
             {Array.from(yearCounts.entries()).map(([year, count]) => (
               <li key={year} className="text-muted">
                 {year} <span className="text-xs">({count})</span>

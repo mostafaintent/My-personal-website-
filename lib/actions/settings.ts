@@ -11,6 +11,7 @@ export async function updateSiteSettings(formData: FormData) {
   const siteName = String(formData.get("siteName") ?? "").trim();
   const authorName = String(formData.get("authorName") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
+  const bioEnabled = formData.get("bioEnabled") === "on";
   const itemsPerPage = Math.max(1, Number(formData.get("itemsPerPage") ?? 5));
   const bannerImageUrl = String(formData.get("bannerImageUrl") ?? "").trim();
   const footerNote = String(formData.get("footerNote") ?? "").trim();
@@ -44,6 +45,7 @@ export async function updateSiteSettings(formData: FormData) {
       site_name: siteName,
       author_name: authorName,
       bio,
+      bio_enabled: bioEnabled,
       items_per_page: itemsPerPage,
       favorite_reads: favoriteSlugs,
       banner_image_url: bannerImageUrl,

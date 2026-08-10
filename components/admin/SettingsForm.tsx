@@ -23,6 +23,7 @@ export default function SettingsForm({
   initialSiteName,
   initialAuthorName,
   initialBio,
+  initialBioEnabled,
   initialItemsPerPage,
   initialFavoriteSlugs,
   initialBannerImageUrl,
@@ -37,6 +38,7 @@ export default function SettingsForm({
   initialSiteName: string;
   initialAuthorName: string;
   initialBio: string;
+  initialBioEnabled: boolean;
   initialItemsPerPage: number;
   initialFavoriteSlugs: string[];
   initialBannerImageUrl: string;
@@ -142,15 +144,26 @@ export default function SettingsForm({
         />
       </label>
 
-      <label className="flex flex-col gap-1 text-sm">
-        معرفی کوتاه (بالای ستون کناری نشان داده می‌شود)
+      <div className="flex flex-col gap-1 text-sm">
+        <div className="flex items-center justify-between">
+          <span>معرفی کوتاه (بالای ستون کناری نشان داده می‌شود)</span>
+          <label className="flex items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              name="bioEnabled"
+              defaultChecked={initialBioEnabled}
+              className="accent-accent"
+            />
+            نمایش داده بشه
+          </label>
+        </div>
         <textarea
           name="bio"
           rows={4}
           defaultValue={initialBio}
           className="rounded-lg border border-border bg-card px-4 py-2.5 outline-none focus:border-accent"
         />
-      </label>
+      </div>
 
       <label className="flex flex-col gap-1 text-sm">
         تعداد مقاله در هر صفحه

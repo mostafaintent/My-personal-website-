@@ -28,6 +28,7 @@ export default async function AdminSettingsPage({
         initialSiteName={settings.siteName}
         initialAuthorName={settings.authorName}
         initialBio={settings.bio}
+        initialBioEnabled={settings.bioEnabled}
         initialItemsPerPage={settings.itemsPerPage}
         initialFavoriteSlugs={settings.favoriteSlugs}
         initialBannerImageUrl={settings.bannerImageUrl}

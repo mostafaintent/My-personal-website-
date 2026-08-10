@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Vazirmatn, Noto_Naskh_Arabic } from "next/font/google";
+import {
+  Vazirmatn,
+  Noto_Naskh_Arabic,
+  Tajawal,
+  Noto_Sans_Arabic,
+  IBM_Plex_Sans_Arabic,
+  Lalezar,
+} from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getSiteSettings } from "@/lib/settings";
@@ -14,6 +21,31 @@ const notoNaskh = Noto_Naskh_Arabic({
   variable: "--font-naskh",
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
+});
+
+// میترا/یکان/زار فونت‌های مالکیت‌دار (غیررایگان) هستن و امکان جاسازی
+// قانونیشون توی وب نیست؛ این‌ها معادل‌های آزاد و رایگانِ نزدیک بهشون‌ان.
+const tajawal = Tajawal({
+  variable: "--font-tajawal",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "700"],
+});
+
+const notoSansArabic = Noto_Sans_Arabic({
+  variable: "--font-noto-sans-arabic",
+  subsets: ["arabic", "latin"],
+});
+
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-ibm-plex-arabic",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const lalezar = Lalezar({
+  variable: "--font-lalezar",
+  subsets: ["arabic", "latin"],
+  weight: ["400"],
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -32,7 +64,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="fa"
       dir="rtl"
-      className={`${vazirmatn.variable} ${notoNaskh.variable} h-full antialiased`}
+      className={`${vazirmatn.variable} ${notoNaskh.variable} ${tajawal.variable} ${notoSansArabic.variable} ${ibmPlexSansArabic.variable} ${lalezar.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <Header />

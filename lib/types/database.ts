@@ -93,6 +93,7 @@ export type SiteSettingsRow = {
   site_name: string;
   author_name: string;
   bio: string;
+  bio_enabled: boolean;
   items_per_page: number;
   favorite_reads: string[];
   banner_image_url: string;
