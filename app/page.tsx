@@ -28,7 +28,7 @@ export default async function Home({
         <div className="hidden min-w-0 sm:block">
           <Sidebar />
         </div>
-        <div className="pl-[1.5cm]">
+        <div className="sm:pl-[1.5cm]">
           {articles.length > 0 ? (
             articles.map((article, i) => (
               <ArticleFullCard

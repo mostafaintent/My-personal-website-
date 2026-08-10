@@ -19,7 +19,8 @@ export default function MobileNavDrawer({ children }: { children: React.ReactNod
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm sm:hidden"
+        className="absolute z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card/90 text-foreground shadow-sm sm:hidden"
+        style={{ top: "0.5cm", right: "0.5cm" }}
         aria-label="باز کردن منو"
       >
         <Menu size={22} />

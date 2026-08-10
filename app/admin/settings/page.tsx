@@ -32,6 +32,8 @@ export default async function AdminSettingsPage({
         initialFavoriteSlugs={settings.favoriteSlugs}
         initialBannerImageUrl={settings.bannerImageUrl}
         initialShareLinks={settings.shareLinks}
+        initialSocialLinks={settings.socialLinks}
+        initialFooterNote={settings.footerNote}
         articles={(articles ?? []).map((a) => ({
           slug: a.slug,
           title: a.title,

@@ -13,9 +13,4 @@ export const siteConfig = {
     { href: "/about", label: "درباره" },
     { href: "/support", label: "حمایت" },
   ],
-  social: [
-    { href: "#", label: "ایمیل" },
-    { href: "#", label: "تلگرام" },
-    { href: "#", label: "اینستاگرام" },
-  ],
 } as const;

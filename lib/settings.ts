@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { FavoriteReadItem } from "@/lib/types/database";
+import type { FavoriteReadItem, SocialLink } from "@/lib/types/database";
 import { SHARE_LINK_OPTIONS } from "@/lib/share-links";
 
 export interface SiteSettings {
@@ -11,6 +11,8 @@ export interface SiteSettings {
   favoriteSlugs: string[];
   bannerImageUrl: string;
   shareLinks: string[];
+  socialLinks: SocialLink[];
+  footerNote: string;
 }
 
 const DEFAULTS: SiteSettings = {
@@ -22,6 +24,12 @@ const DEFAULTS: SiteSettings = {
   favoriteSlugs: [],
   bannerImageUrl: "",
   shareLinks: SHARE_LINK_OPTIONS.map((o) => o.key),
+  socialLinks: [
+    { label: "ایمیل", url: "#" },
+    { label: "تلگرام", url: "#" },
+    { label: "اینستاگرام", url: "#" },
+  ],
+  footerNote: "تمام مقاله‌های رایگان اینجا با عشق نوشته می‌شن.",
 };
 
 // favorite_reads توی دیتابیس فقط یه آرایه از اسلاگه، نه عکس/عنوان — چون اگه
@@ -79,6 +87,10 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     ? data.share_links
     : DEFAULTS.shareLinks;
 
+  const socialLinks = Array.isArray(data.social_links) && data.social_links.length > 0
+    ? data.social_links
+    : DEFAULTS.socialLinks;
+
   return {
     siteName: data.site_name || DEFAULTS.siteName,
     authorName: data.author_name || DEFAULTS.authorName,
@@ -88,5 +100,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     favoriteSlugs,
     bannerImageUrl: data.banner_image_url || "",
     shareLinks,
+    socialLinks,
+    footerNote: data.footer_note || DEFAULTS.footerNote,
   };
 }

@@ -8,13 +8,13 @@ export default async function Header() {
 
   return (
     <header>
-      <MobileNavDrawer>
-        <Sidebar />
-      </MobileNavDrawer>
       <div
-        className="text-center"
+        className="relative text-center"
         style={{ marginTop: "0.5cm", marginBottom: "1cm", marginInline: "2cm" }}
       >
+        <MobileNavDrawer>
+          <Sidebar />
+        </MobileNavDrawer>
         <Link href="/" className="inline-block">
           {settings.bannerImageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element

@@ -13,6 +13,7 @@ export async function updateSiteSettings(formData: FormData) {
   const bio = String(formData.get("bio") ?? "").trim();
   const itemsPerPage = Math.max(1, Number(formData.get("itemsPerPage") ?? 5));
   const bannerImageUrl = String(formData.get("bannerImageUrl") ?? "").trim();
+  const footerNote = String(formData.get("footerNote") ?? "").trim();
 
   let favoriteSlugs: string[] = [];
   try {
@@ -28,6 +29,14 @@ export async function updateSiteSettings(formData: FormData) {
     shareLinks = [];
   }
 
+  let socialLinks: { label: string; url: string }[] = [];
+  try {
+    socialLinks = JSON.parse(String(formData.get("socialLinks") ?? "[]"));
+  } catch {
+    socialLinks = [];
+  }
+  socialLinks = socialLinks.filter((link) => link.label.trim() && link.url.trim());
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("site_settings")
@@ -39,6 +48,8 @@ export async function updateSiteSettings(formData: FormData) {
       favorite_reads: favoriteSlugs,
       banner_image_url: bannerImageUrl,
       share_links: shareLinks,
+      social_links: socialLinks,
+      footer_note: footerNote,
       updated_at: new Date().toISOString(),
     })
     .eq("id", true);

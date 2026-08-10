@@ -83,6 +83,11 @@ export type FavoriteReadItem = {
   url: string;
 };
 
+export type SocialLink = {
+  label: string;
+  url: string;
+};
+
 export type SiteSettingsRow = {
   id: boolean;
   site_name: string;
@@ -92,6 +97,8 @@ export type SiteSettingsRow = {
   favorite_reads: string[];
   banner_image_url: string;
   share_links: string[];
+  social_links: SocialLink[];
+  footer_note: string;
   updated_at: string;
 };
 

@@ -13,6 +13,11 @@ interface ArticleOption {
   imageUrl: string;
 }
 
+interface SocialLinkEntry {
+  label: string;
+  url: string;
+}
+
 export default function SettingsForm({
   action,
   initialSiteName,
@@ -22,6 +27,8 @@ export default function SettingsForm({
   initialFavoriteSlugs,
   initialBannerImageUrl,
   initialShareLinks,
+  initialSocialLinks,
+  initialFooterNote,
   articles,
   error,
   message,
@@ -34,6 +41,8 @@ export default function SettingsForm({
   initialFavoriteSlugs: string[];
   initialBannerImageUrl: string;
   initialShareLinks: string[];
+  initialSocialLinks: SocialLinkEntry[];
+  initialFooterNote: string;
   articles: ArticleOption[];
   error?: string;
   message?: string;
@@ -43,6 +52,7 @@ export default function SettingsForm({
   const [bannerImageUrl, setBannerImageUrl] = useState(initialBannerImageUrl);
   const [bannerUploading, setBannerUploading] = useState(false);
   const [shareLinks, setShareLinks] = useState<string[]>(initialShareLinks);
+  const [socialLinks, setSocialLinks] = useState<SocialLinkEntry[]>(initialSocialLinks);
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
   const bySlug = useMemo(() => new Map(articles.map((a) => [a.slug, a])), [articles]);
@@ -69,6 +79,20 @@ export default function SettingsForm({
     setShareLinks((links) =>
       links.includes(key) ? links.filter((k) => k !== key) : [...links, key]
     );
+  }
+
+  function addSocialLink() {
+    setSocialLinks((links) => [...links, { label: "", url: "" }]);
+  }
+
+  function updateSocialLink(index: number, field: "label" | "url", value: string) {
+    setSocialLinks((links) =>
+      links.map((link, i) => (i === index ? { ...link, [field]: value } : link))
+    );
+  }
+
+  function removeSocialLink(index: number) {
+    setSocialLinks((links) => links.filter((_, i) => i !== index));
   }
 
   async function handleBannerChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -281,6 +305,62 @@ export default function SettingsForm({
       </div>
 
       <input type="hidden" name="favoriteReads" value={JSON.stringify(favoriteSlugs)} />
+
+      <div>
+        <p className="mb-1 text-sm font-medium">لینک‌های شبکه‌های اجتماعی (پایین سایت)</p>
+        <p className="mb-3 text-xs text-muted">
+          هر تعداد لینک که می‌خواید اضافه کنید (تلگرام، ایمیل، اینستاگرام،
+          واتساپ، یا هر پلتفرم دیگه‌ای) — می‌تونید کم یا زیادش کنید و
+          آدرسش رو هر وقت خواستید عوض کنید.
+        </p>
+        <div className="flex flex-col gap-2">
+          {socialLinks.map((link, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={link.label}
+                onChange={(e) => updateSocialLink(index, "label", e.target.value)}
+                placeholder="عنوان (مثلاً تلگرام)"
+                className="w-32 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
+              />
+              <input
+                type="text"
+                value={link.url}
+                onChange={(e) => updateSocialLink(index, "url", e.target.value)}
+                placeholder="آدرس لینک"
+                className="flex-1 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
+              />
+              <button
+                type="button"
+                onClick={() => removeSocialLink(index)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center text-muted hover:text-accent"
+                aria-label="حذف لینک"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={addSocialLink}
+          className="mt-2 flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm hover:border-accent"
+        >
+          <Plus size={14} className="text-accent" />
+          افزودن لینک
+        </button>
+        <input type="hidden" name="socialLinks" value={JSON.stringify(socialLinks)} />
+      </div>
+
+      <label className="flex flex-col gap-1 text-sm">
+        متن پاورقی (زیر لینک‌های اجتماعی، کنار اسم سایت نشان داده می‌شود)
+        <textarea
+          name="footerNote"
+          rows={2}
+          defaultValue={initialFooterNote}
+          className="rounded-lg border border-border bg-card px-4 py-2.5 outline-none focus:border-accent"
+        />
+      </label>
 
       <button
         type="submit"
