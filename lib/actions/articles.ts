@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 import type { ArticleCategory, ArticleStatus } from "@/lib/types/database";
@@ -43,6 +43,7 @@ export async function createArticle(formData: FormData) {
     redirect(`/admin/articles/new?error=${encodeURIComponent(error.message)}`);
   }
 
+  updateTag("articles");
   revalidatePath("/articles");
   revalidatePath("/");
   redirect("/admin/articles");
@@ -75,6 +76,7 @@ export async function updateArticle(articleId: string, formData: FormData) {
     redirect(`/admin/articles/${articleId}/edit?error=${encodeURIComponent(error.message)}`);
   }
 
+  updateTag("articles");
   revalidatePath("/articles");
   revalidatePath("/");
   revalidatePath(`/articles/${fields.slug}`);
@@ -85,6 +87,7 @@ export async function deleteArticle(articleId: string) {
   await requireAdmin();
   const supabase = await createClient();
   await supabase.from("articles").delete().eq("id", articleId);
+  updateTag("articles");
   revalidatePath("/admin/articles");
   revalidatePath("/articles");
   revalidatePath("/");

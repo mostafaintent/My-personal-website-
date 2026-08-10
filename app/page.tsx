@@ -5,7 +5,7 @@ import Pagination from "@/components/Pagination";
 import { getAllArticlesFull } from "@/lib/articles";
 import { getSiteSettings } from "@/lib/settings";
 import { getCurrentUser } from "@/lib/auth";
-import { hasAccess } from "@/lib/payments/access";
+import { getUnlockedMap } from "@/lib/payments/access";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +18,7 @@ export default async function Home({
   const page = Math.max(1, Number(pageParam) || 1);
   const [settings, current] = await Promise.all([getSiteSettings(), getCurrentUser()]);
   const { articles, total, perPage } = await getAllArticlesFull(page, settings.itemsPerPage);
-  const unlockedFlags = await Promise.all(
-    articles.map((article) => hasAccess(current?.id ?? null, article))
-  );
+  const unlockedMap = await getUnlockedMap(current?.id ?? null, articles);
 
   return (
     <Container wide className="pb-14">
@@ -30,12 +28,12 @@ export default async function Home({
         </div>
         <div className="mx-auto w-full max-w-2xl">
           {articles.length > 0 ? (
-            articles.map((article, i) => (
+            articles.map((article) => (
               <ArticleFullCard
                 key={article.slug}
                 article={article}
                 authorName={settings.authorName}
-                unlocked={unlockedFlags[i]}
+                unlocked={unlockedMap[article.id] ?? false}
                 isLoggedIn={Boolean(current)}
               />
             ))

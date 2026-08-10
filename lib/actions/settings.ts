@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
 
@@ -60,6 +60,7 @@ export async function updateSiteSettings(formData: FormData) {
     redirect(`/admin/settings?error=${encodeURIComponent(error.message)}`);
   }
 
+  updateTag("site-settings");
   revalidatePath("/", "layout");
   redirect("/admin/settings?message=" + encodeURIComponent("ذخیره شد"));
 }

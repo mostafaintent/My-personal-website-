@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
 import { CATEGORIES } from "@/lib/articles";
+import { createPublicClient } from "@/lib/supabase/public";
 import SearchBox from "./SearchBox";
 
 const NAV_LINKS = [
@@ -10,28 +11,45 @@ const NAV_LINKS = [
   { href: "/articles", label: "مقاله‌ها" },
 ];
 
+// دسته‌ها/بایگانی توی سایدبار روی همه‌ی صفحات ثابته و به‌ندرت عوض می‌شه؛
+// کش‌کردنش یه رفت‌وبرگشت به دیتابیس رو از هر بار رندر سایدبار حذف می‌کنه.
+const fetchSidebarStats = unstable_cache(
+  async (): Promise<{ categoryCounts: [string, number][]; yearCounts: [string, number][] }> => {
+    const supabase = createPublicClient();
+    const { data: articles } = await supabase
+      .from("articles")
+      .select("category, published_at")
+      .eq("status", "published");
+
+    const categoryCounts = new Map<string, number>();
+    const yearCounts = new Map<string, number>();
+
+    (articles ?? []).forEach((a) => {
+      categoryCounts.set(a.category, (categoryCounts.get(a.category) ?? 0) + 1);
+      const year = new Date(a.published_at ?? "").toLocaleDateString("fa-IR-u-ca-persian", {
+        year: "numeric",
+      });
+      yearCounts.set(year, (yearCounts.get(year) ?? 0) + 1);
+    });
+
+    return {
+      categoryCounts: Array.from(categoryCounts.entries()),
+      yearCounts: Array.from(yearCounts.entries()),
+    };
+  },
+  ["sidebar-stats"],
+  { revalidate: 60, tags: ["articles"] }
+);
+
 export default async function Sidebar({ query }: { query?: string }) {
-  const [current, settings, supabase] = await Promise.all([
+  const [current, settings, stats] = await Promise.all([
     getCurrentUser(),
     getSiteSettings(),
-    createClient(),
+    fetchSidebarStats(),
   ]);
 
-  const { data: articles } = await supabase
-    .from("articles")
-    .select("category, published_at")
-    .eq("status", "published");
-
-  const categoryCounts = new Map<string, number>();
-  const yearCounts = new Map<string, number>();
-
-  (articles ?? []).forEach((a) => {
-    categoryCounts.set(a.category, (categoryCounts.get(a.category) ?? 0) + 1);
-    const year = new Date(a.published_at ?? "").toLocaleDateString("fa-IR-u-ca-persian", {
-      year: "numeric",
-    });
-    yearCounts.set(year, (yearCounts.get(year) ?? 0) + 1);
-  });
+  const categoryCounts = new Map(stats.categoryCounts);
+  const yearCounts = new Map(stats.yearCounts);
 
   return (
     <aside className="flex flex-col gap-8 text-sm">

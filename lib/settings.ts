@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
-import type { FavoriteReadItem, SocialLink } from "@/lib/types/database";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
+import type { FavoriteReadItem, SocialLink, SiteSettingsRow } from "@/lib/types/database";
 import { SHARE_LINK_OPTIONS } from "@/lib/share-links";
 
 export interface SiteSettings {
@@ -51,39 +52,63 @@ function extractSlugs(raw: unknown): string[] {
     .filter(Boolean);
 }
 
+// این کوئری (تنظیمات سایت + لیست برگزیده‌ها) روی همه‌ی صفحات سایت اجرا
+// می‌شه، برای همین نتیجه‌ش رو یک دقیقه کش می‌کنیم تا هر بازدید یه رفت‌وبرگشت
+// جدید به Supabase نزنه. از کلاینت بدون کوکی استفاده می‌کنیم چون
+// unstable_cache اجازه‌ی خوندن کوکی/session داخل تابع کش‌شده رو نمی‌ده.
+const fetchSiteSettingsData = unstable_cache(
+  async (): Promise<{ row: SiteSettingsRow; favoriteReads: FavoriteReadItem[] } | null> => {
+    // این تابع حالا ممکنه موقع build (پیش‌رندر استاتیک صفحه‌های بدون
+    // وابستگی dynamic) هم اجرا بشه، جایی که env variable ها یا اتصال شبکه
+    // ممکنه در دسترس نباشن؛ برای همین به‌جای کرش کل build، روی خطا مقادیر
+    // پیش‌فرض (DEFAULTS) رو برمی‌گردونیم.
+    try {
+      const supabase = createPublicClient();
+      const { data } = await supabase
+        .from("site_settings")
+        .select("*")
+        .eq("id", true)
+        .maybeSingle();
+
+      if (!data) return null;
+
+      const favoriteSlugs = extractSlugs(data.favorite_reads);
+      let favoriteReads: FavoriteReadItem[] = [];
+
+      if (favoriteSlugs.length > 0) {
+        const { data: articles } = await supabase
+          .from("articles")
+          .select("slug, title, cover_image_url")
+          .eq("status", "published")
+          .in("slug", favoriteSlugs);
+
+        const bySlug = new Map((articles ?? []).map((a) => [a.slug, a]));
+        favoriteReads = favoriteSlugs
+          .map((slug) => {
+            const article = bySlug.get(slug);
+            if (!article) return null;
+            return {
+              title: article.title,
+              imageUrl: article.cover_image_url ?? "",
+              url: `/articles/${encodeURIComponent(article.slug)}`,
+            };
+          })
+          .filter((item): item is FavoriteReadItem => item !== null);
+      }
+
+      return { row: data, favoriteReads };
+    } catch {
+      return null;
+    }
+  },
+  ["site-settings"],
+  { revalidate: 60, tags: ["site-settings"] }
+);
+
 export async function getSiteSettings(): Promise<SiteSettings> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("site_settings")
-    .select("*")
-    .eq("id", true)
-    .maybeSingle();
-
-  if (!data) return DEFAULTS;
-
-  const favoriteSlugs = extractSlugs(data.favorite_reads);
-  let favoriteReads: FavoriteReadItem[] = [];
-
-  if (favoriteSlugs.length > 0) {
-    const { data: articles } = await supabase
-      .from("articles")
-      .select("slug, title, cover_image_url")
-      .eq("status", "published")
-      .in("slug", favoriteSlugs);
-
-    const bySlug = new Map((articles ?? []).map((a) => [a.slug, a]));
-    favoriteReads = favoriteSlugs
-      .map((slug) => {
-        const article = bySlug.get(slug);
-        if (!article) return null;
-        return {
-          title: article.title,
-          imageUrl: article.cover_image_url ?? "",
-          url: `/articles/${encodeURIComponent(article.slug)}`,
-        };
-      })
-      .filter((item): item is FavoriteReadItem => item !== null);
-  }
+  const cached = await fetchSiteSettingsData();
+  if (!cached) return DEFAULTS;
+  const { row: data, favoriteReads } = cached;
 
   const shareLinks = Array.isArray(data.share_links) && data.share_links.length > 0
     ? data.share_links
@@ -100,7 +125,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     bioEnabled: Boolean(data.bio_enabled),
     itemsPerPage: data.items_per_page || DEFAULTS.itemsPerPage,
     favoriteReads,
-    favoriteSlugs,
+    favoriteSlugs: extractSlugs(data.favorite_reads),
     bannerImageUrl: data.banner_image_url || "",
     shareLinks,
     socialLinks,
