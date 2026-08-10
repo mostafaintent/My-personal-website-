@@ -1,5 +1,10 @@
 import sanitizeHtml from "sanitize-html";
 
+// برای جاهایی مثل توضیح متا (SEO) که فقط متن ساده لازم دارن، نه HTML خلاصه.
+export function stripHtmlToText(html: string): string {
+  return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} }).trim();
+}
+
 export function sanitizeArticleHtml(html: string): string {
   return sanitizeHtml(html, {
     allowedTags: [

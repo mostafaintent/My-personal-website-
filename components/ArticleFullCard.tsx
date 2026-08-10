@@ -4,7 +4,6 @@ import { formatJalaliDate } from "@/lib/format";
 import { sanitizeArticleHtml } from "@/lib/sanitize";
 import PremiumBadge from "./PremiumBadge";
 import PaywallGate from "./PaywallGate";
-import Tag from "./Tag";
 
 export default function ArticleFullCard({
   article,
@@ -42,17 +41,14 @@ export default function ArticleFullCard({
         />
       ) : (
         <>
-          {article.excerpt && <p className="mt-4 leading-8 text-muted">{article.excerpt}</p>}
+          {article.excerpt && (
+            <div
+              className="mt-4 leading-8 text-muted"
+              dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.excerpt) }}
+            />
+          )}
           <PaywallGate priceIRR={article.priceIRR} priceUSD={article.priceUSD} isLoggedIn={isLoggedIn} />
         </>
-      )}
-
-      {article.tags.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {article.tags.map((tag) => (
-            <Tag key={tag} label={tag} />
-          ))}
-        </div>
       )}
     </article>
   );

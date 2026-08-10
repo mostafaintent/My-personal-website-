@@ -43,12 +43,7 @@ export default async function ArticlesPage({
           {articles.length > 0 ? (
             <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2">
               {articles.map((article) => (
-                <ArticleCard
-                  key={article.slug}
-                  article={article}
-                  authorName={settings.authorName}
-                  hideTags={Boolean(q)}
-                />
+                <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
               ))}
             </div>
           ) : (

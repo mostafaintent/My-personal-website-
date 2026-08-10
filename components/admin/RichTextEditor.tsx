@@ -33,21 +33,7 @@ import { uploadArticleImage, uploadArticleFile } from "@/lib/storage";
 import Embed from "@/lib/tiptap-embed";
 import LineHeight from "@/lib/tiptap-line-height";
 import AlignableImage from "@/lib/tiptap-image";
-
-const FONT_FAMILIES = [
-  { label: "پیش‌فرض", value: "" },
-  { label: "وزیرمتن", value: "var(--font-vazirmatn)" },
-  { label: "نسخ (سریف)", value: "var(--font-naskh)" },
-  { label: "تجاول", value: "var(--font-tajawal)" },
-  { label: "نوتو سنس", value: "var(--font-noto-sans-arabic)" },
-  { label: "پلکس عربی", value: "var(--font-ibm-plex-arabic)" },
-  { label: "لاله‌زار (تزئینی)", value: "var(--font-lalezar)" },
-  { label: "مونو", value: "monospace" },
-];
-
-const FONT_SIZES = ["", "14px", "16px", "18px", "20px", "24px", "28px", "32px"];
-
-const LINE_HEIGHTS = ["", "0.5", "0.75", "1", "1.3", "1.5", "1.8", "2", "2.5"];
+import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from "@/lib/editor-options";
 
 function ToolbarButton({
   onClick,

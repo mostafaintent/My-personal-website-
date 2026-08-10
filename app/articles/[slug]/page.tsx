@@ -11,7 +11,7 @@ import { hasAccess } from "@/lib/payments/access";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
 import { formatJalaliDate } from "@/lib/format";
-import { sanitizeArticleHtml } from "@/lib/sanitize";
+import { sanitizeArticleHtml, stripHtmlToText } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +23,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await getArticleBySlug(decodeURIComponent(slug));
   if (!article) return {};
-  return { title: article.title, description: article.excerpt };
+  return { title: article.title, description: stripHtmlToText(article.excerpt) };
 }
 
 export default async function ArticlePage({
@@ -77,12 +77,6 @@ export default async function ArticlePage({
             />
           )}
 
-          <ShareBar
-            path={`/articles/${encodeURIComponent(article.slug)}`}
-            title={article.title}
-            enabled={settings.shareLinks}
-          />
-
           {article.tags.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm">
               <span className="text-muted">برچسب‌ها:</span>
@@ -91,6 +85,12 @@ export default async function ArticlePage({
               ))}
             </div>
           )}
+
+          <ShareBar
+            path={`/articles/${encodeURIComponent(article.slug)}`}
+            title={article.title}
+            enabled={settings.shareLinks}
+          />
 
           {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
         </article>

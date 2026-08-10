@@ -5,6 +5,7 @@ import type { ArticleRow, CategoryRow } from "@/lib/types/database";
 import { slugify } from "@/lib/slug";
 import { uploadArticleImage } from "@/lib/storage";
 import RichTextEditor from "./RichTextEditor";
+import ExcerptEditor from "./ExcerptEditor";
 
 export default function ArticleForm({
   action,
@@ -21,6 +22,7 @@ export default function ArticleForm({
   const [title, setTitle] = useState(defaultValues?.title ?? "");
   const [premium, setPremium] = useState(defaultValues?.premium ?? false);
   const [content, setContent] = useState(defaultValues?.content ?? "");
+  const [excerpt, setExcerpt] = useState(defaultValues?.excerpt ?? "");
   const [coverImageUrl, setCoverImageUrl] = useState(defaultValues?.cover_image_url ?? "");
   const [uploadingCover, setUploadingCover] = useState(false);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -62,15 +64,13 @@ export default function ArticleForm({
       </p>
       <input type="hidden" name="slug" value={slug} />
 
-      <label className="flex flex-col gap-1 text-sm">
-        خلاصه <span className="text-xs text-muted">(اختیاری — اگر خالی بماند، زیر عنوان چیزی نشان داده نمی‌شود)</span>
-        <textarea
-          name="excerpt"
-          rows={2}
-          defaultValue={defaultValues?.excerpt}
-          className="rounded-lg border border-border bg-card px-4 py-2.5 text-base outline-none focus:border-accent"
-        />
-      </label>
+      <div className="flex flex-col gap-1 text-sm">
+        <span>
+          خلاصه <span className="text-xs text-muted">(اختیاری — اگر خالی بماند، زیر عنوان چیزی نشان داده نمی‌شود)</span>
+        </span>
+        <ExcerptEditor initialContent={excerpt} onChange={setExcerpt} />
+        <input type="hidden" name="excerpt" value={excerpt} />
+      </div>
 
       <div className="flex flex-col gap-2 text-sm">
         <span>تصویر شاخص (اختیاری — برای نمایش در بخش «برگزیده‌ها»)</span>
