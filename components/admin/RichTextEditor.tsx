@@ -412,7 +412,9 @@ export default function RichTextEditor({
       LineHeight,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
-      TiptapImage,
+      // inline:true تا عکس داخل یه پاراگراف قرار بگیره و بشه با همون دکمه‌های
+      // چینش (راست‌چین/وسط‌چین/چپ‌چین) که برای پاراگراف هست، جاش رو تغییر داد.
+      TiptapImage.configure({ inline: true }),
       Embed,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "متن مقاله را اینجا بنویسید..." }),
