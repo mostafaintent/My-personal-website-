@@ -103,6 +103,12 @@ export type SiteSettingsRow = {
   updated_at: string;
 };
 
+export type PageViewRow = {
+  id: number;
+  path: string;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -149,6 +155,12 @@ export type Database = {
         Row: SiteSettingsRow;
         Insert: Partial<SiteSettingsRow>;
         Update: Partial<SiteSettingsRow>;
+        Relationships: [];
+      };
+      page_views: {
+        Row: PageViewRow;
+        Insert: Partial<PageViewRow> & { path: string };
+        Update: Partial<PageViewRow>;
         Relationships: [];
       };
     };

@@ -15,6 +15,7 @@ function StatCard({ label, value }: { label: string; value: number | string }) {
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
+  const dayAgo = daysAgoIso(1);
   const weekAgo = daysAgoIso(7);
   const now = nowIso();
 
@@ -27,6 +28,9 @@ export default async function AdminDashboardPage() {
     { count: activeSubs },
     { count: expiredSubs },
     { count: completedPurchases },
+    { count: viewsToday },
+    { count: viewsWeek },
+    { count: viewsTotal },
   ] = await Promise.all([
     supabase.from("articles").select("id", { count: "exact", head: true }),
     supabase.from("articles").select("id", { count: "exact", head: true }).eq("status", "published"),
@@ -43,6 +47,9 @@ export default async function AdminDashboardPage() {
       .select("id", { count: "exact", head: true })
       .or(`status.neq.active,current_period_end.lte.${now}`),
     supabase.from("purchases").select("id", { count: "exact", head: true }).eq("status", "completed"),
+    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", dayAgo),
+    supabase.from("page_views").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+    supabase.from("page_views").select("id", { count: "exact", head: true }),
   ]);
 
   return (
@@ -58,6 +65,15 @@ export default async function AdminDashboardPage() {
       </div>
 
       <div className="flex flex-col gap-6">
+        <div>
+          <p className="mb-3 text-xs font-medium text-muted-light">بازدید سایت</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard label="بازدید ۲۴ ساعت اخیر" value={viewsToday ?? 0} />
+            <StatCard label="بازدید ۷ روز اخیر" value={viewsWeek ?? 0} />
+            <StatCard label="کل بازدیدها" value={viewsTotal ?? 0} />
+          </div>
+        </div>
+
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">مقاله‌ها</p>
           <div className="grid gap-4 sm:grid-cols-3">
@@ -95,8 +111,8 @@ export default async function AdminDashboardPage() {
           برید.
         </p>
         <p className="mt-2">
-          آمار بازدید صفحات سایت (تعداد ورودی، صفحات پربازدید و غیره) توی داشبورد
-          خودِ Vercel قابل مشاهده‌ست — بخش Analytics پروژه‌تون.
+          برای جزئیات بیشتر بازدید (مثل کشور، دستگاه، صفحات پربازدید)، بخش
+          Analytics داشبورد Vercel رو هم می‌تونید ببینید.
         </p>
       </div>
     </div>

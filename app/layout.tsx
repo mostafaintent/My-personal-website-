@@ -10,6 +10,7 @@ import {
 } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import PageViewTracker from "@/components/PageViewTracker";
 import { getSiteSettings } from "@/lib/settings";
 import "./globals.css";
 
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <Footer />
         <Analytics />
+        <PageViewTracker />
       </body>
     </html>
   );
