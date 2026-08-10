@@ -3,7 +3,6 @@ import ArticleCard from "@/components/ArticleCard";
 import Sidebar from "@/components/Sidebar";
 import Pagination from "@/components/Pagination";
 import { getAllArticles, getArticlesByCategory, searchArticles } from "@/lib/articles";
-import { getSiteSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "مقاله‌ها" };
@@ -20,7 +19,6 @@ export default async function ArticlesPage({
 }) {
   const { category, q, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  const settings = await getSiteSettings();
 
   const { articles, total, perPage } = q
     ? await searchArticles(q, page, PER_PAGE)
@@ -43,7 +41,7 @@ export default async function ArticlesPage({
           {articles.length > 0 ? (
             <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2">
               {articles.map((article) => (
-                <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
+                <ArticleCard key={article.slug} article={article} />
               ))}
             </div>
           ) : (
