@@ -1,15 +1,48 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { daysAgoIso, nowIso } from "@/lib/format";
 
 export const metadata = { title: "داشبورد مدیریت" };
 
+function StatCard({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-6 text-center">
+      <p className="text-sm text-muted">{label}</p>
+      <p className="mt-2 text-3xl font-bold">{value}</p>
+    </div>
+  );
+}
+
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
+  const weekAgo = daysAgoIso(7);
+  const now = nowIso();
 
-  const [{ count: total }, { count: published }, { count: commentsCount }] = await Promise.all([
+  const [
+    { count: total },
+    { count: published },
+    { count: commentsCount },
+    { count: usersTotal },
+    { count: usersNew },
+    { count: activeSubs },
+    { count: expiredSubs },
+    { count: completedPurchases },
+  ] = await Promise.all([
     supabase.from("articles").select("id", { count: "exact", head: true }),
     supabase.from("articles").select("id", { count: "exact", head: true }).eq("status", "published"),
     supabase.from("comments").select("id", { count: "exact", head: true }),
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", weekAgo),
+    supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "active")
+      .gt("current_period_end", now),
+    supabase
+      .from("subscriptions")
+      .select("id", { count: "exact", head: true })
+      .or(`status.neq.active,current_period_end.lte.${now}`),
+    supabase.from("purchases").select("id", { count: "exact", head: true }).eq("status", "completed"),
   ]);
 
   return (
@@ -24,19 +57,47 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-sm text-muted">همه‌ی مقالات</p>
-          <p className="mt-2 text-3xl font-bold">{total ?? 0}</p>
+      <div className="flex flex-col gap-6">
+        <div>
+          <p className="mb-3 text-xs font-medium text-muted-light">مقاله‌ها</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard label="همه‌ی مقالات" value={total ?? 0} />
+            <StatCard label="منتشرشده" value={published ?? 0} />
+            <StatCard label="نظرات" value={commentsCount ?? 0} />
+          </div>
         </div>
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-sm text-muted">منتشرشده</p>
-          <p className="mt-2 text-3xl font-bold">{published ?? 0}</p>
+
+        <div>
+          <p className="mb-3 text-xs font-medium text-muted-light">کاربران</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <StatCard label="کل کاربران ثبت‌نامی" value={usersTotal ?? 0} />
+            <StatCard label="کاربران جدید (۷ روز اخیر)" value={usersNew ?? 0} />
+          </div>
         </div>
-        <div className="rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-sm text-muted">نظرات</p>
-          <p className="mt-2 text-3xl font-bold">{commentsCount ?? 0}</p>
+
+        <div>
+          <p className="mb-3 text-xs font-medium text-muted-light">اشتراک و خرید</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard label="مشترکین فعال" value={activeSubs ?? 0} />
+            <StatCard label="مشترکین منقضی/لغوشده" value={expiredSubs ?? 0} />
+            <StatCard label="خریدهای تکمیل‌شده" value={completedPurchases ?? 0} />
+          </div>
         </div>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-border bg-background-soft p-6 text-sm leading-7 text-muted">
+        <p>
+          برای دادن دسترسی به یک کاربر خاص (تا مقاله‌های ویژه رو ببینه) یا فعال‌سازی
+          دستی اشتراک، به بخش{" "}
+          <Link href="/admin/access" className="text-accent hover:underline">
+            دسترسی‌ها
+          </Link>{" "}
+          برید.
+        </p>
+        <p className="mt-2">
+          آمار بازدید صفحات سایت (تعداد ورودی، صفحات پربازدید و غیره) توی داشبورد
+          خودِ Vercel قابل مشاهده‌ست — بخش Analytics پروژه‌تون.
+        </p>
       </div>
     </div>
   );
