@@ -6,7 +6,6 @@ import StarterKit from "@tiptap/starter-kit";
 import { TextStyle, FontFamily, FontSize } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-import TiptapImage from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import {
@@ -33,6 +32,7 @@ import {
 import { uploadArticleImage, uploadArticleFile } from "@/lib/storage";
 import Embed from "@/lib/tiptap-embed";
 import LineHeight from "@/lib/tiptap-line-height";
+import AlignableImage from "@/lib/tiptap-image";
 
 const FONT_FAMILIES = [
   { label: "پیش‌فرض", value: "" },
@@ -166,6 +166,24 @@ function Toolbar({ editor }: { editor: Editor | null }) {
     const url = window.prompt("آدرس پی‌دی‌اف را وارد کنید:", "https://");
     if (!url) return;
     insertPdfLink(url, "دانلود پی‌دی‌اف");
+  };
+
+  // اگه یه عکس انتخاب شده باشه، دکمه‌های چینش جای خودِ عکس رو عوض می‌کنن؛
+  // وگرنه مثل همیشه چینش پاراگراف/تیتر جاری رو تنظیم می‌کنن.
+  const isAligned = (align: "right" | "center" | "left" | "justify") => {
+    if (editor.isActive("image")) {
+      return align !== "justify" && editor.isActive("image", { align });
+    }
+    return editor.isActive({ textAlign: align });
+  };
+
+  const setAlignment = (align: "right" | "center" | "left" | "justify") => {
+    if (editor.isActive("image")) {
+      if (align === "justify") return;
+      editor.chain().focus().updateAttributes("image", { align }).run();
+      return;
+    }
+    editor.chain().focus().setTextAlign(align).run();
   };
 
   return (
@@ -304,31 +322,20 @@ function Toolbar({ editor }: { editor: Editor | null }) {
 
       <div className="mx-1 h-6 w-px bg-border" />
 
-      <ToolbarButton
-        label="راست‌چین"
-        active={editor.isActive({ textAlign: "right" })}
-        onClick={() => editor.chain().focus().setTextAlign("right").run()}
-      >
+      <ToolbarButton label="راست‌چین" active={isAligned("right")} onClick={() => setAlignment("right")}>
         <AlignRight size={16} />
       </ToolbarButton>
-      <ToolbarButton
-        label="وسط‌چین"
-        active={editor.isActive({ textAlign: "center" })}
-        onClick={() => editor.chain().focus().setTextAlign("center").run()}
-      >
+      <ToolbarButton label="وسط‌چین" active={isAligned("center")} onClick={() => setAlignment("center")}>
         <AlignCenter size={16} />
       </ToolbarButton>
-      <ToolbarButton
-        label="چپ‌چین"
-        active={editor.isActive({ textAlign: "left" })}
-        onClick={() => editor.chain().focus().setTextAlign("left").run()}
-      >
+      <ToolbarButton label="چپ‌چین" active={isAligned("left")} onClick={() => setAlignment("left")}>
         <AlignLeft size={16} />
       </ToolbarButton>
       <ToolbarButton
         label="تراز (هم‌ترازی دو طرف)"
-        active={editor.isActive({ textAlign: "justify" })}
-        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
+        active={isAligned("justify")}
+        disabled={editor.isActive("image")}
+        onClick={() => setAlignment("justify")}
       >
         <AlignJustify size={16} />
       </ToolbarButton>
@@ -412,9 +419,7 @@ export default function RichTextEditor({
       LineHeight,
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
-      // inline:true تا عکس داخل یه پاراگراف قرار بگیره و بشه با همون دکمه‌های
-      // چینش (راست‌چین/وسط‌چین/چپ‌چین) که برای پاراگراف هست، جاش رو تغییر داد.
-      TiptapImage.configure({ inline: true }),
+      AlignableImage,
       Embed,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "متن مقاله را اینجا بنویسید..." }),

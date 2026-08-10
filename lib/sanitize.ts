@@ -29,7 +29,7 @@ export function sanitizeArticleHtml(html: string): string {
     ],
     allowedAttributes: {
       a: ["href", "target", "rel", "download", "class"],
-      img: ["src", "alt"],
+      img: ["src", "alt", "style", "data-align"],
       span: ["style"],
       p: ["style"],
       h1: ["style"],
@@ -49,6 +49,12 @@ export function sanitizeArticleHtml(html: string): string {
         "font-family": [/^[\w\s,'"()\-]+$/],
         "text-align": [/^(left|right|center|justify)$/],
         "line-height": [/^[\d.]+$/],
+      },
+      img: {
+        display: [/^block$/],
+        "margin-inline-start": [/^(auto|0)$/],
+        "margin-inline-end": [/^(auto|0)$/],
+        "margin-block": [/^[\d.]+em$/],
       },
     },
     allowedSchemes: ["http", "https", "mailto"],
