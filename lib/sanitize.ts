@@ -5,6 +5,14 @@ export function stripHtmlToText(html: string): string {
   return sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} }).trim();
 }
 
+// خلاصه‌ها معمولاً در ستون‌های باریک (کارت‌های آرشیو) نمایش داده می‌شن، جایی
+// که «تراز» (justify) روی متن فارسی چند خطِ کوتاه، به‌خاطر نبود پشتیبانی
+// مرورگرها از کشیدگیِ حروف فارسی/عربی، باعث فاصله‌ی بیش‌ازحد بین کلمات
+// می‌شه. برای همین موقع نمایش خلاصه، این تراز رو نادیده می‌گیریم.
+export function sanitizeExcerptHtml(html: string): string {
+  return sanitizeArticleHtml(html).replace(/text-align:\s*justify;?/gi, "");
+}
+
 export function sanitizeArticleHtml(html: string): string {
   return sanitizeHtml(html, {
     allowedTags: [

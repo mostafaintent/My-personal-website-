@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Article } from "@/lib/articles";
 import { formatJalaliDate } from "@/lib/format";
-import { sanitizeArticleHtml } from "@/lib/sanitize";
+import { sanitizeArticleHtml, sanitizeExcerptHtml } from "@/lib/sanitize";
 import PremiumBadge from "./PremiumBadge";
 import PaywallGate from "./PaywallGate";
 
@@ -44,7 +44,7 @@ export default function ArticleFullCard({
           {article.excerpt && (
             <div
               className="mt-4 leading-8 text-muted"
-              dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.excerpt) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeExcerptHtml(article.excerpt) }}
             />
           )}
           <PaywallGate priceIRR={article.priceIRR} priceUSD={article.priceUSD} isLoggedIn={isLoggedIn} />

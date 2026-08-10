@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArticleMeta } from "@/lib/articles";
-import { sanitizeArticleHtml } from "@/lib/sanitize";
+import { sanitizeExcerptHtml } from "@/lib/sanitize";
 import PremiumBadge from "./PremiumBadge";
 
 export default function ArticleCard({ article }: { article: ArticleMeta }) {
@@ -25,7 +25,7 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
       {article.excerpt && (
         <div
           className="mt-3 leading-8 text-muted"
-          dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.excerpt) }}
+          dangerouslySetInnerHTML={{ __html: sanitizeExcerptHtml(article.excerpt) }}
         />
       )}
       <span className="mt-4 inline-block rounded-md bg-banner-yellow px-4 py-1.5 text-xs font-medium text-foreground transition-opacity group-hover:opacity-90">

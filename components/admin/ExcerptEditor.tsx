@@ -14,7 +14,6 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  AlignJustify,
 } from "lucide-react";
 import LineHeight from "@/lib/tiptap-line-height";
 import { FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS } from "@/lib/editor-options";
@@ -144,13 +143,6 @@ function Toolbar({ editor }: { editor: Editor | null }) {
         onClick={() => editor.chain().focus().setTextAlign("left").run()}
       >
         <AlignLeft size={14} />
-      </ToolbarButton>
-      <ToolbarButton
-        label="تراز (هم‌ترازی دو طرف)"
-        active={editor.isActive({ textAlign: "justify" })}
-        onClick={() => editor.chain().focus().setTextAlign("justify").run()}
-      >
-        <AlignJustify size={14} />
       </ToolbarButton>
     </div>
   );
