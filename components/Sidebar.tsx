@@ -34,7 +34,7 @@ export default async function Sidebar({ query }: { query?: string }) {
   });
 
   return (
-    <aside className="flex flex-col gap-8 text-base">
+    <aside className="flex flex-col gap-8 text-sm">
       {settings.bioEnabled && settings.bio && (
         <p className="leading-7 text-muted">{settings.bio}</p>
       )}

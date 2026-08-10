@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useEditor, EditorContent, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { TextStyle, FontFamily, FontSize, LineHeight } from "@tiptap/extension-text-style";
+import { TextStyle, FontFamily, FontSize } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 import TiptapImage from "@tiptap/extension-image";
@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { uploadArticleImage } from "@/lib/storage";
 import Embed from "@/lib/tiptap-embed";
+import LineHeight from "@/lib/tiptap-line-height";
 
 const FONT_FAMILIES = [
   { label: "پیش‌فرض", value: "" },
@@ -186,7 +187,10 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <select
         className="h-9 rounded-md border border-border bg-card px-2 text-sm"
         title="فاصله‌ی خطوط"
-        value={(editor.getAttributes("textStyle").lineHeight as string) ?? ""}
+        value={
+          ((editor.getAttributes("paragraph").lineHeight ??
+            editor.getAttributes("heading").lineHeight) as string) ?? ""
+        }
         onChange={(e) => {
           const value = e.target.value;
           if (!value) editor.chain().focus().unsetLineHeight().run();
