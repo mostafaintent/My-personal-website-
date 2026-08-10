@@ -5,17 +5,26 @@ import DeleteArticleButton from "@/components/admin/DeleteArticleButton";
 
 export const metadata = { title: "مقالات" };
 
-export default async function AdminArticlesPage() {
+export default async function AdminArticlesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const { status } = await searchParams;
   const supabase = await createClient();
-  const { data: articles } = await supabase
+  let query = supabase
     .from("articles")
     .select("id, slug, title, status, category, premium, created_at")
     .order("created_at", { ascending: false });
+  if (status === "published" || status === "draft") {
+    query = query.eq("status", status);
+  }
+  const { data: articles } = await query;
 
   return (
     <div>
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">مقالات</h1>
+        <h1 className="text-3xl font-bold">{status === "published" ? "مقالات منتشرشده" : "مقالات"}</h1>
         <Link
           href="/admin/articles/new"
           className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:opacity-90"

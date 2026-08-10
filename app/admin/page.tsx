@@ -4,12 +4,23 @@ import { daysAgoIso, nowIso } from "@/lib/format";
 
 export const metadata = { title: "داشبورد مدیریت" };
 
-function StatCard({ label, value }: { label: string; value: number | string }) {
+function StatCard({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value: number | string;
+  href: string;
+}) {
   return (
-    <div className="rounded-xl border border-border bg-card p-6 text-center">
+    <Link
+      href={href}
+      className="block rounded-xl border border-border bg-card p-6 text-center transition-colors hover:border-accent"
+    >
       <p className="text-sm text-muted">{label}</p>
       <p className="mt-2 text-3xl font-bold">{value}</p>
-    </div>
+    </Link>
   );
 }
 
@@ -68,35 +79,43 @@ export default async function AdminDashboardPage() {
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">بازدید سایت</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="بازدید ۲۴ ساعت اخیر" value={viewsToday ?? 0} />
-            <StatCard label="بازدید ۷ روز اخیر" value={viewsWeek ?? 0} />
-            <StatCard label="کل بازدیدها" value={viewsTotal ?? 0} />
+            <StatCard label="بازدید ۲۴ ساعت اخیر" value={viewsToday ?? 0} href="/admin/analytics?range=1" />
+            <StatCard label="بازدید ۷ روز اخیر" value={viewsWeek ?? 0} href="/admin/analytics?range=7" />
+            <StatCard label="کل بازدیدها" value={viewsTotal ?? 0} href="/admin/analytics?range=all" />
           </div>
         </div>
 
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">مقاله‌ها</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="همه‌ی مقالات" value={total ?? 0} />
-            <StatCard label="منتشرشده" value={published ?? 0} />
-            <StatCard label="نظرات" value={commentsCount ?? 0} />
+            <StatCard label="همه‌ی مقالات" value={total ?? 0} href="/admin/articles" />
+            <StatCard label="منتشرشده" value={published ?? 0} href="/admin/articles?status=published" />
+            <StatCard label="نظرات" value={commentsCount ?? 0} href="/admin/comments" />
           </div>
         </div>
 
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">کاربران</p>
           <div className="grid gap-4 sm:grid-cols-2">
-            <StatCard label="کل کاربران ثبت‌نامی" value={usersTotal ?? 0} />
-            <StatCard label="کاربران جدید (۷ روز اخیر)" value={usersNew ?? 0} />
+            <StatCard label="کل کاربران ثبت‌نامی" value={usersTotal ?? 0} href="/admin/users" />
+            <StatCard label="کاربران جدید (۷ روز اخیر)" value={usersNew ?? 0} href="/admin/users" />
           </div>
         </div>
 
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">اشتراک و خرید</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="مشترکین فعال" value={activeSubs ?? 0} />
-            <StatCard label="مشترکین منقضی/لغوشده" value={expiredSubs ?? 0} />
-            <StatCard label="خریدهای تکمیل‌شده" value={completedPurchases ?? 0} />
+            <StatCard label="مشترکین فعال" value={activeSubs ?? 0} href="/admin/subscriptions?status=active" />
+            <StatCard
+              label="مشترکین منقضی/لغوشده"
+              value={expiredSubs ?? 0}
+              href="/admin/subscriptions?status=expired"
+            />
+            <StatCard
+              label="خریدهای تکمیل‌شده"
+              value={completedPurchases ?? 0}
+              href="/admin/purchases?status=completed"
+            />
           </div>
         </div>
       </div>
