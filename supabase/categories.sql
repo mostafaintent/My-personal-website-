@@ -4,8 +4,12 @@
 -- یک مقاله رو از دسته‌ای به دسته‌ی دیگه جابه‌جا کرد.
 
 -- ستون category مقاله‌ها قبلاً از نوع enum ثابت بود؛ به متن آزاد تبدیلش
--- می‌کنیم چون دیگه لیست دسته‌ها از دیتابیس میاد نه از کد.
-alter table articles alter column category type text;
+-- می‌کنیم چون دیگه لیست دسته‌ها از دیتابیس میاد نه از کد. اول باید مقدار
+-- پیش‌فرض ستون رو برداریم، چون همون مقدار پیش‌فرض هم به enum وابسته‌ست و
+-- تا برداشته نشه، خودِ enum قابل حذف نیست.
+alter table articles alter column category drop default;
+alter table articles alter column category type text using category::text;
+alter table articles alter column category set default 'یادداشت';
 drop type if exists article_category;
 
 create table categories (
