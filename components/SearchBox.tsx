@@ -1,7 +1,7 @@
 export default function SearchBox({ defaultValue }: { defaultValue?: string }) {
   return (
     <form action="/articles" method="GET" className="flex flex-col gap-2">
-      <label htmlFor="q" className="text-xs font-medium text-muted">
+      <label htmlFor="q" className="text-xs font-medium text-muted-light">
         جست‌وجو
       </label>
       <input

@@ -5,6 +5,7 @@
   --background-soft: #f3ece0;
   --foreground: #000000;
   --muted: #46423c;
+  --muted-light: #a29a8b;
   --accent: #a8501f;
   --accent-soft: #c97a4a;
   --border: #e6dbc8;
@@ -16,6 +17,7 @@
   --color-background-soft: var(--background-soft);
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
+  --color-muted-light: var(--muted-light);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-border: var(--border);
