@@ -8,10 +8,7 @@ export default async function Header() {
 
   return (
     <header>
-      <div
-        className="relative text-center"
-        style={{ marginTop: "0.5cm", marginBottom: "1cm", marginInline: "2cm" }}
-      >
+      <div className="mx-[0.5cm] mb-[1cm] mt-[0.5cm] text-center sm:mx-[2cm]">
         <MobileNavDrawer>
           <Sidebar />
         </MobileNavDrawer>
