@@ -8,6 +8,11 @@ import { getSiteSettings } from "@/lib/settings";
 export const dynamic = "force-dynamic";
 export const metadata = { title: "مقاله‌ها" };
 
+// این صفحه (آرشیو/دسته‌بندی/جست‌وجو) برخلاف صفحه‌ی اصلی، متن کامل مقاله رو
+// نشون نمی‌ده — فقط خلاصه — پس تعداد بیشتری در هر صفحه جا می‌شه؛ مستقل از
+// تنظیم «تعداد مقاله در هر صفحه» که مخصوص صفحه‌ی اصلیه.
+const PER_PAGE = 10;
+
 export default async function ArticlesPage({
   searchParams,
 }: {
@@ -18,10 +23,10 @@ export default async function ArticlesPage({
   const settings = await getSiteSettings();
 
   const { articles, total, perPage } = q
-    ? await searchArticles(q, page, settings.itemsPerPage)
+    ? await searchArticles(q, page, PER_PAGE)
     : category
-      ? await getArticlesByCategory(category, page, settings.itemsPerPage)
-      : await getAllArticles(page, settings.itemsPerPage);
+      ? await getArticlesByCategory(category, page, PER_PAGE)
+      : await getAllArticles(page, PER_PAGE);
 
   const heading = q ? `نتیجه‌ی جست‌وجو برای «${q}»` : category ? category : "آرشیو مقاله‌ها";
   const basePath = "/articles";
@@ -36,14 +41,16 @@ export default async function ArticlesPage({
         <div className="sm:pl-[1.5cm]">
           <h1 className="mb-10 text-3xl font-bold">{heading}</h1>
           {articles.length > 0 ? (
-            articles.map((article) => (
-              <ArticleCard
-                key={article.slug}
-                article={article}
-                authorName={settings.authorName}
-                hideTags={Boolean(q)}
-              />
-            ))
+            <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2">
+              {articles.map((article) => (
+                <ArticleCard
+                  key={article.slug}
+                  article={article}
+                  authorName={settings.authorName}
+                  hideTags={Boolean(q)}
+                />
+              ))}
+            </div>
           ) : (
             <p className="text-muted">چیزی پیدا نشد.</p>
           )}

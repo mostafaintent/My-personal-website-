@@ -14,10 +14,7 @@ export default function ArticleCard({
   hideTags?: boolean;
 }) {
   return (
-    <Link
-      href={`/articles/${encodeURIComponent(article.slug)}`}
-      className="group block border-b border-border py-8 first:pt-0 last:border-b-0"
-    >
+    <Link href={`/articles/${encodeURIComponent(article.slug)}`} className="group block">
       {article.coverImageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -46,6 +43,9 @@ export default function ArticleCard({
           ))}
         </div>
       )}
+      <span className="mt-4 inline-block rounded-md bg-accent px-4 py-1.5 text-xs font-medium text-white transition-opacity group-hover:opacity-90">
+        خواندن مقاله
+      </span>
     </Link>
   );
 }
