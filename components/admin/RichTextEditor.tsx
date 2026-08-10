@@ -101,13 +101,30 @@ function Toolbar({ editor }: { editor: Editor | null }) {
     }
   };
 
+  const insertPdfLink = (url: string, defaultTitle: string) => {
+    const title = window.prompt(
+      "عنوان پی‌دی‌اف را وارد کنید (همین متن به‌صورت لینک قابل‌کلیک در مقاله می‌آید):",
+      defaultTitle
+    );
+    if (!title) return;
+    editor
+      .chain()
+      .focus()
+      .insertContent({
+        type: "text",
+        text: title,
+        marks: [{ type: "link", attrs: { href: url } }],
+      })
+      .run();
+  };
+
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
     try {
       const url = await uploadArticleFile(file);
-      editor.chain().focus().setEmbed({ src: url, mediaType: "pdf" }).run();
+      insertPdfLink(url, file.name.replace(/\.pdf$/i, ""));
     } catch {
       alert("آپلود پی‌دی‌اف ناموفق بود. دوباره امتحان کنید.");
     }
@@ -146,12 +163,9 @@ function Toolbar({ editor }: { editor: Editor | null }) {
   };
 
   const insertPdf = () => {
-    const url = window.prompt(
-      "آدرس embed پی‌دی‌اف را وارد کنید (مثلاً لینک preview گوگل‌درایو):",
-      "https://"
-    );
+    const url = window.prompt("آدرس پی‌دی‌اف را وارد کنید:", "https://");
     if (!url) return;
-    editor.chain().focus().setEmbed({ src: url, mediaType: "pdf" }).run();
+    insertPdfLink(url, "دانلود پی‌دی‌اف");
   };
 
   return (
@@ -337,10 +351,10 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <ToolbarButton label="افزودن ویدیو (با آدرس)" onClick={insertVideo}>
         <Film size={16} />
       </ToolbarButton>
-      <ToolbarButton label="افزودن پی‌دی‌اف (با آدرس)" onClick={insertPdf}>
+      <ToolbarButton label="افزودن لینک پی‌دی‌اف (با آدرس)" onClick={insertPdf}>
         <FileText size={16} />
       </ToolbarButton>
-      <ToolbarButton label="آپلود پی‌دی‌اف از دستگاه" onClick={() => pdfInputRef.current?.click()}>
+      <ToolbarButton label="آپلود پی‌دی‌اف از دستگاه (به‌صورت لینک)" onClick={() => pdfInputRef.current?.click()}>
         <Upload size={16} />
       </ToolbarButton>
       <input
