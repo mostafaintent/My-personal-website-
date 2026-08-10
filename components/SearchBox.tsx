@@ -1,7 +1,7 @@
 export default function SearchBox({ defaultValue }: { defaultValue?: string }) {
   return (
     <form action="/articles" method="GET" className="flex flex-col gap-2">
-      <label htmlFor="q" className="font-semibold">
+      <label htmlFor="q" className="text-xs font-medium text-muted">
         جست‌وجو
       </label>
       <input
@@ -10,7 +10,7 @@ export default function SearchBox({ defaultValue }: { defaultValue?: string }) {
         type="search"
         defaultValue={defaultValue}
         placeholder="در نوشته‌ها بگرد..."
-        className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm outline-none focus:border-accent"
+        className="w-full min-w-0 rounded-lg border border-border bg-card px-3 py-2 text-sm text-muted outline-none placeholder:text-muted focus:border-accent"
       />
     </form>
   );

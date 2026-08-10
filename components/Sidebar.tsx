@@ -62,15 +62,15 @@ export default async function Sidebar({ query }: { query?: string }) {
 
       {categoryCounts.size > 0 && (
         <div>
-          <p className="mb-4 font-semibold">دسته‌ها</p>
+          <p className="mb-3 text-xs font-medium text-muted">دسته‌ها</p>
           <ul className="flex flex-col gap-3">
             {CATEGORIES.filter((c) => categoryCounts.has(c)).map((c) => (
               <li key={c}>
                 <Link
                   href={`/articles?category=${encodeURIComponent(c)}`}
-                  className="text-muted transition-colors hover:text-accent"
+                  className="text-foreground transition-colors hover:text-accent"
                 >
-                  {c} <span className="text-xs">({categoryCounts.get(c)})</span>
+                  {c} <span className="text-xs text-muted">({categoryCounts.get(c)})</span>
                 </Link>
               </li>
             ))}
@@ -80,11 +80,11 @@ export default async function Sidebar({ query }: { query?: string }) {
 
       {yearCounts.size > 0 && (
         <div>
-          <p className="mb-4 font-semibold">بایگانی</p>
+          <p className="mb-3 text-xs font-medium text-muted">بایگانی</p>
           <ul className="flex flex-col gap-3">
             {Array.from(yearCounts.entries()).map(([year, count]) => (
-              <li key={year} className="text-muted">
-                {year} <span className="text-xs">({count})</span>
+              <li key={year} className="text-foreground">
+                {year} <span className="text-xs text-muted">({count})</span>
               </li>
             ))}
           </ul>
@@ -93,7 +93,7 @@ export default async function Sidebar({ query }: { query?: string }) {
 
       {settings.favoriteReads.length > 0 && (
         <div>
-          <p className="mb-3 font-semibold">برگزیده‌ها</p>
+          <p className="mb-3 text-xs font-medium text-muted">از اینجا شروع کن</p>
           <ul className="flex flex-col gap-5">
             {settings.favoriteReads.map((item, i) => (
               <li key={i}>
@@ -106,7 +106,7 @@ export default async function Sidebar({ query }: { query?: string }) {
                       className="mb-2 aspect-video w-full rounded-md object-cover"
                     />
                   )}
-                  <span className="text-muted transition-colors group-hover:text-accent">
+                  <span className="text-foreground transition-colors group-hover:text-accent">
                     {item.title}
                   </span>
                 </Link>
