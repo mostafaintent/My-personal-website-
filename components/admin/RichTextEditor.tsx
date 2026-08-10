@@ -27,8 +27,10 @@ import {
   Redo,
   Film,
   FileText,
+  Music,
+  Upload,
 } from "lucide-react";
-import { uploadArticleImage } from "@/lib/storage";
+import { uploadArticleImage, uploadArticleFile } from "@/lib/storage";
 import Embed from "@/lib/tiptap-embed";
 import LineHeight from "@/lib/tiptap-line-height";
 
@@ -80,6 +82,8 @@ function ToolbarButton({
 
 function Toolbar({ editor }: { editor: Editor | null }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pdfInputRef = useRef<HTMLInputElement>(null);
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;
 
@@ -94,6 +98,30 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       editor.chain().focus().setImage({ src: url }).run();
     } catch {
       alert("آپلود عکس ناموفق بود. دوباره امتحان کنید.");
+    }
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const url = await uploadArticleFile(file);
+      editor.chain().focus().setEmbed({ src: url, mediaType: "pdf" }).run();
+    } catch {
+      alert("آپلود پی‌دی‌اف ناموفق بود. دوباره امتحان کنید.");
+    }
+  };
+
+  const handleAudioUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const url = await uploadArticleFile(file);
+      editor.chain().focus().setEmbed({ src: url, mediaType: "audio" }).run();
+    } catch {
+      alert("آپلود فایل صوتی ناموفق بود. دوباره امتحان کنید.");
     }
   };
 
@@ -312,6 +340,26 @@ function Toolbar({ editor }: { editor: Editor | null }) {
       <ToolbarButton label="افزودن پی‌دی‌اف (با آدرس)" onClick={insertPdf}>
         <FileText size={16} />
       </ToolbarButton>
+      <ToolbarButton label="آپلود پی‌دی‌اف از دستگاه" onClick={() => pdfInputRef.current?.click()}>
+        <Upload size={16} />
+      </ToolbarButton>
+      <input
+        ref={pdfInputRef}
+        type="file"
+        accept="application/pdf"
+        className="hidden"
+        onChange={handlePdfUpload}
+      />
+      <ToolbarButton label="آپلود فایل صوتی" onClick={() => audioInputRef.current?.click()}>
+        <Music size={16} />
+      </ToolbarButton>
+      <input
+        ref={audioInputRef}
+        type="file"
+        accept="audio/*"
+        className="hidden"
+        onChange={handleAudioUpload}
+      />
 
       <div className="mx-1 h-6 w-px bg-border" />
 

@@ -25,9 +25,10 @@ export function sanitizeArticleHtml(html: string): string {
       "span",
       "div",
       "iframe",
+      "audio",
     ],
     allowedAttributes: {
-      a: ["href", "target", "rel"],
+      a: ["href", "target", "rel", "download", "class"],
       img: ["src", "alt"],
       span: ["style"],
       p: ["style"],
@@ -36,9 +37,11 @@ export function sanitizeArticleHtml(html: string): string {
       h3: ["style"],
       h4: ["style"],
       div: ["data-embed-type", "class"],
-      // iframe فقط از سمت مدیر سایت (نویسنده) وارد محتوا می‌شه، نه کاربر عمومی —
-      // با این حال src رو به https محدود می‌کنیم تا خطر تزریق لینک ناامن کم بشه.
+      // iframe/audio فقط از سمت مدیر سایت (نویسنده) وارد محتوا می‌شن، نه کاربر
+      // عمومی — با این حال src رو به https محدود می‌کنیم تا خطر تزریق لینک
+      // ناامن کم بشه.
       iframe: ["src", "allowfullscreen", "loading", "referrerpolicy"],
+      audio: ["src", "controls"],
     },
     allowedStyles: {
       "*": {
@@ -51,9 +54,11 @@ export function sanitizeArticleHtml(html: string): string {
     allowedSchemes: ["http", "https", "mailto"],
     allowedSchemesByTag: {
       iframe: ["https"],
+      audio: ["https"],
     },
     allowedClasses: {
-      div: ["embed-video", "embed-pdf"],
+      div: ["embed-video", "embed-pdf", "embed-audio"],
+      a: ["embed-download-link"],
     },
   });
 }

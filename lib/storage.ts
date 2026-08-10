@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const BUCKET = "article-images";
 const SITE_ASSETS_BUCKET = "site-assets";
+const ARTICLE_FILES_BUCKET = "article-files";
 
 async function uploadTo(bucket: string, file: File): Promise<string> {
   const supabase = createClient();
@@ -25,4 +26,8 @@ export async function uploadArticleImage(file: File): Promise<string> {
 
 export async function uploadSiteImage(file: File): Promise<string> {
   return uploadTo(SITE_ASSETS_BUCKET, file);
+}
+
+export async function uploadArticleFile(file: File): Promise<string> {
+  return uploadTo(ARTICLE_FILES_BUCKET, file);
 }

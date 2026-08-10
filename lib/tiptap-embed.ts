@@ -1,8 +1,9 @@
 import { Node, mergeAttributes } from "@tiptap/core";
 
-// نود سفارشی برای جاسازی ویدیو یا پی‌دی‌اف با آدرس (URL) — چون میزبانی
-// مستقیم فایل نیاز به زیرساخت جدا داره، فعلاً فقط جاسازی از طریق لینک
-// (مثلاً آپارات، یوتیوب، یا لینک embed گوگل‌درایو/درایو دیگر) پشتیبانی می‌شه.
+// نود سفارشی برای جاسازی ویدیو (فقط با آدرس)، یا پی‌دی‌اف/فایل صوتی
+// (با آدرس یا آپلود مستقیم از طریق Supabase Storage).
+export type EmbedMediaType = "video" | "pdf" | "audio";
+
 export interface EmbedOptions {
   HTMLAttributes: Record<string, unknown>;
 }
@@ -10,7 +11,7 @@ export interface EmbedOptions {
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
     embed: {
-      setEmbed: (options: { src: string; mediaType: "video" | "pdf" }) => ReturnType;
+      setEmbed: (options: { src: string; mediaType: EmbedMediaType }) => ReturnType;
     };
   }
 }
@@ -33,21 +34,42 @@ const Embed = Node.create<EmbedOptions>({
   },
 
   parseHTML() {
-    return [{ tag: 'div[data-embed-type]' }];
+    return [{ tag: "div[data-embed-type]" }];
   },
 
   renderHTML({ node, HTMLAttributes }) {
-    const isPdf = node.attrs.mediaType === "pdf";
+    const mediaType = node.attrs.mediaType as EmbedMediaType;
+    const src = node.attrs.src as string;
+    const wrapperAttrs = mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+      "data-embed-type": mediaType,
+      class: `embed-${mediaType}`,
+    });
+
+    if (mediaType === "audio") {
+      return [
+        "div",
+        wrapperAttrs,
+        ["audio", { src, controls: "true" }],
+        ["a", { href: src, download: "", class: "embed-download-link" }, "دانلود فایل صوتی"],
+      ];
+    }
+
+    if (mediaType === "pdf") {
+      return [
+        "div",
+        wrapperAttrs,
+        ["iframe", { src, loading: "lazy", referrerpolicy: "no-referrer" }],
+        ["a", { href: src, download: "", class: "embed-download-link" }, "دانلود پی‌دی‌اف"],
+      ];
+    }
+
     return [
       "div",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        "data-embed-type": node.attrs.mediaType,
-        class: isPdf ? "embed-pdf" : "embed-video",
-      }),
+      wrapperAttrs,
       [
         "iframe",
         {
-          src: node.attrs.src,
+          src,
           allowfullscreen: "true",
           loading: "lazy",
           referrerpolicy: "no-referrer",
