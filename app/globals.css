@@ -10,6 +10,8 @@
   --accent-soft: #c97a4a;
   --border: #e6dbc8;
   --card: #fffdf8;
+  /* هم‌رنگ زردِ بنر بالای سایت — برای برچسب‌ها، دکمه‌ی ارسال نظر، و ادامه‌ی مطلب */
+  --banner-yellow: #f5c518;
 }
 
 @theme inline {
@@ -22,6 +24,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-border: var(--border);
   --color-card: var(--card);
+  --color-banner-yellow: var(--banner-yellow);
   --font-body: var(--font-vazirmatn);
   --font-display: var(--font-naskh);
 }

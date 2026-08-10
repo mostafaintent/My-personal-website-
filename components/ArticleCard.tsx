@@ -28,7 +28,7 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
           dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.excerpt) }}
         />
       )}
-      <span className="mt-4 inline-block rounded-md bg-accent px-4 py-1.5 text-xs font-medium text-white transition-opacity group-hover:opacity-90">
+      <span className="mt-4 inline-block rounded-md bg-banner-yellow px-4 py-1.5 text-xs font-medium text-foreground transition-opacity group-hover:opacity-90">
         ادامه‌ی مطلب
       </span>
     </Link>

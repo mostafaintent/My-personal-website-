@@ -41,7 +41,7 @@ export default async function Comments({
           />
           <button
             type="submit"
-            className="self-start rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white hover:opacity-90"
+            className="self-start rounded-lg bg-banner-yellow px-5 py-2 text-sm font-medium text-foreground hover:opacity-90"
           >
             ارسال نظر
           </button>
