@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import ArticleForm from "@/components/admin/ArticleForm";
 import { updateArticle } from "@/lib/actions/articles";
 import { createClient } from "@/lib/supabase/server";
+import { getCategories } from "@/lib/categories";
 
 export const metadata = { title: "ویرایش مقاله" };
 
@@ -16,7 +17,10 @@ export default async function EditArticlePage({
   const { error } = await searchParams;
 
   const supabase = await createClient();
-  const { data: article } = await supabase.from("articles").select("*").eq("id", id).single();
+  const [{ data: article }, categories] = await Promise.all([
+    supabase.from("articles").select("*").eq("id", id).single(),
+    getCategories(),
+  ]);
 
   if (!article) notFound();
 
@@ -25,7 +29,7 @@ export default async function EditArticlePage({
   return (
     <div>
       <h1 className="mb-8 text-3xl font-bold">ویرایش مقاله</h1>
-      <ArticleForm action={updateWithId} defaultValues={article} error={error} />
+      <ArticleForm action={updateWithId} defaultValues={article} categories={categories} error={error} />
     </div>
   );
 }

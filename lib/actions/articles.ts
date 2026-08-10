@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/auth";
-import type { ArticleCategory, ArticleStatus } from "@/lib/types/database";
+import type { ArticleStatus } from "@/lib/types/database";
 
 function readArticleForm(formData: FormData) {
   const premium = formData.get("premium") === "on";
@@ -18,7 +18,7 @@ function readArticleForm(formData: FormData) {
     title: String(formData.get("title") ?? "").trim(),
     excerpt: String(formData.get("excerpt") ?? "").trim(),
     content: String(formData.get("content") ?? ""),
-    category: String(formData.get("category") ?? "یادداشت") as ArticleCategory,
+    category: String(formData.get("category") ?? "").trim(),
     tags,
     premium,
     cover_image_url: String(formData.get("coverImageUrl") ?? "").trim() || null,

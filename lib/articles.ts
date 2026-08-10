@@ -2,16 +2,6 @@ import readingTime from "reading-time";
 import { createClient } from "@/lib/supabase/server";
 import type { ArticleCategory, ArticleRow } from "@/lib/types/database";
 
-export const CATEGORIES: ArticleCategory[] = [
-  "یادداشت",
-  "ادبیات",
-  "فلسفه",
-  "روان‌شناسی",
-  "تاریخ",
-  "عرفان",
-  "ترجمه",
-];
-
 export interface ArticleMeta {
   id: string;
   slug: string;
@@ -102,7 +92,7 @@ export async function getArticlesByCategory(
     .from("articles")
     .select("*", { count: "exact" })
     .eq("status", "published")
-    .eq("category", category as ArticleCategory)
+    .eq("category", category)
     .order("published_at", { ascending: false })
     .range(from, from + perPage - 1);
   return { articles: (data ?? []).map(toMeta), total: count ?? 0, page, perPage };

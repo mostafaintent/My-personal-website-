@@ -1,20 +1,20 @@
 "use client";
 
 import { useRef, useState } from "react";
-import type { ArticleRow } from "@/lib/types/database";
+import type { ArticleRow, CategoryRow } from "@/lib/types/database";
 import { slugify } from "@/lib/slug";
 import { uploadArticleImage } from "@/lib/storage";
 import RichTextEditor from "./RichTextEditor";
 
-const CATEGORIES = ["یادداشت", "ادبیات", "فلسفه", "روان‌شناسی", "تاریخ", "عرفان", "ترجمه"];
-
 export default function ArticleForm({
   action,
   defaultValues,
+  categories,
   error,
 }: {
   action: (formData: FormData) => void;
   defaultValues?: Partial<ArticleRow>;
+  categories: CategoryRow[];
   error?: string;
 }) {
   const isEditing = Boolean(defaultValues?.slug);
@@ -126,12 +126,12 @@ export default function ArticleForm({
           دسته‌بندی
           <select
             name="category"
-            defaultValue={defaultValues?.category ?? "یادداشت"}
+            defaultValue={defaultValues?.category ?? categories[0]?.name}
             className="rounded-lg border border-border bg-card px-4 py-2.5 text-base outline-none focus:border-accent"
           >
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
               </option>
             ))}
           </select>

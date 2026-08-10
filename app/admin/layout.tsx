@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 const NAV = [
   { href: "/admin", label: "داشبورد" },
   { href: "/admin/articles", label: "مقالات" },
+  { href: "/admin/categories", label: "دسته‌بندی‌ها" },
   { href: "/admin/comments", label: "نظرات" },
   { href: "/admin/users", label: "کاربران" },
   { href: "/admin/access", label: "دسترسی‌ها" },

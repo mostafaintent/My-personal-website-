@@ -6,14 +6,9 @@
 // generic کتابخانه‌ی supabase-js با `extends Record<string, unknown>` چک
 // می‌شن و interface (بر خلاف type) اون قید رو satisfy نمی‌کنه.
 
-export type ArticleCategory =
-  | "یادداشت"
-  | "ادبیات"
-  | "فلسفه"
-  | "روان‌شناسی"
-  | "تاریخ"
-  | "عرفان"
-  | "ترجمه";
+// دسته‌بندی‌ها قبلاً یک enum ثابت بودن؛ الان از جدول categories (قابل
+// مدیریت از پنل ادمین) میان، پس نوعشون آزادانه string شد.
+export type ArticleCategory = string;
 
 export type ArticleStatus = "draft" | "published";
 export type PaymentMethodDb = "bank_gateway" | "paypal" | "crypto";
@@ -109,6 +104,13 @@ export type PageViewRow = {
   created_at: string;
 };
 
+export type CategoryRow = {
+  id: string;
+  name: string;
+  sort_order: number;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -161,6 +163,12 @@ export type Database = {
         Row: PageViewRow;
         Insert: Partial<PageViewRow> & { path: string };
         Update: Partial<PageViewRow>;
+        Relationships: [];
+      };
+      categories: {
+        Row: CategoryRow;
+        Insert: Partial<CategoryRow> & { name: string };
+        Update: Partial<CategoryRow>;
         Relationships: [];
       };
     };

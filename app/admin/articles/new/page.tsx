@@ -1,5 +1,6 @@
 import ArticleForm from "@/components/admin/ArticleForm";
 import { createArticle } from "@/lib/actions/articles";
+import { getCategories } from "@/lib/categories";
 
 export const metadata = { title: "مقاله جدید" };
 
@@ -9,11 +10,12 @@ export default async function NewArticlePage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const categories = await getCategories();
 
   return (
     <div>
       <h1 className="mb-8 text-3xl font-bold">مقاله‌ی جدید</h1>
-      <ArticleForm action={createArticle} error={error} />
+      <ArticleForm action={createArticle} categories={categories} error={error} />
     </div>
   );
 }

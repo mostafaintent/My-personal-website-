@@ -2,7 +2,7 @@ import Link from "next/link";
 import { unstable_cache } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
-import { CATEGORIES } from "@/lib/articles";
+import { getCategories } from "@/lib/categories";
 import { createPublicClient } from "@/lib/supabase/public";
 import SearchBox from "./SearchBox";
 
@@ -42,10 +42,11 @@ const fetchSidebarStats = unstable_cache(
 );
 
 export default async function Sidebar({ query }: { query?: string }) {
-  const [current, settings, stats] = await Promise.all([
+  const [current, settings, stats, categories] = await Promise.all([
     getCurrentUser(),
     getSiteSettings(),
     fetchSidebarStats(),
+    getCategories(),
   ]);
 
   const categoryCounts = new Map(stats.categoryCounts);
@@ -82,16 +83,18 @@ export default async function Sidebar({ query }: { query?: string }) {
         <div>
           <p className="mb-3 text-xs font-medium text-muted-light">دسته‌ها</p>
           <ul className="flex flex-col gap-3">
-            {CATEGORIES.filter((c) => categoryCounts.has(c)).map((c) => (
-              <li key={c}>
-                <Link
-                  href={`/articles?category=${encodeURIComponent(c)}`}
-                  className="text-foreground transition-colors hover:text-accent"
-                >
-                  {c} <span className="text-xs text-muted">({categoryCounts.get(c)})</span>
-                </Link>
-              </li>
-            ))}
+            {categories
+              .filter((c) => categoryCounts.has(c.name))
+              .map((c) => (
+                <li key={c.id}>
+                  <Link
+                    href={`/articles?category=${encodeURIComponent(c.name)}`}
+                    className="text-foreground transition-colors hover:text-accent"
+                  >
+                    {c.name} <span className="text-xs text-muted">({categoryCounts.get(c.name)})</span>
+                  </Link>
+                </li>
+              ))}
           </ul>
         </div>
       )}

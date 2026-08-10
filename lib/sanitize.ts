@@ -52,8 +52,13 @@ export function sanitizeArticleHtml(html: string): string {
       },
       img: {
         display: [/^block$/],
-        "margin-inline-start": [/^(auto|0)$/],
-        "margin-inline-end": [/^(auto|0)$/],
+        // مرورگر وقتی Tiptap با editor.getHTML() سریالایز می‌کنه، اگه
+        // margin-inline-start/end رو با هم ست کنیم، خودکار به‌صورت
+        // shorthand «margin-inline» می‌نویسدشون؛ باید همین حالت رو هم
+        // مجاز کنیم وگرنه کل مقدار margin افقی عکس حذف می‌شه.
+        "margin-inline-start": [/^(auto|0(?:px)?)$/],
+        "margin-inline-end": [/^(auto|0(?:px)?)$/],
+        "margin-inline": [/^(auto|0(?:px)?)(\s+(auto|0(?:px)?))?$/],
         "margin-block": [/^[\d.]+em$/],
       },
     },
