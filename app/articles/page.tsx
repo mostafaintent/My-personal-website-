@@ -33,11 +33,16 @@ export default async function ArticlesPage({
         <div className="hidden min-w-0 sm:block">
           <Sidebar query={q} />
         </div>
-        <div className="sm:pl-[1.5cm]">
+        <div className="mx-auto w-full max-w-2xl">
           <h1 className="mb-10 text-3xl font-bold">{heading}</h1>
           {articles.length > 0 ? (
             articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} authorName={settings.authorName} />
+              <ArticleCard
+                key={article.slug}
+                article={article}
+                authorName={settings.authorName}
+                hideTags={Boolean(q)}
+              />
             ))
           ) : (
             <p className="text-muted">چیزی پیدا نشد.</p>
