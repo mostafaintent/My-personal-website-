@@ -85,6 +85,17 @@ export default async function ArticlePage({
             )}
           </header>
 
+          <div className="mb-8 flex justify-center">
+            <ArticleInteractions
+              articleId={article.id}
+              articleSlug={article.slug}
+              isLoggedIn={Boolean(current)}
+              initialLiked={flags.liked}
+              initialFavorited={flags.favorited}
+              likeCount={likeCount}
+            />
+          </div>
+
           <div
             className="prose-article"
             dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}

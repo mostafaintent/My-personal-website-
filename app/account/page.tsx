@@ -29,16 +29,26 @@ function ArticleListCard({
     <div className="rounded-xl border border-border bg-card p-6">
       <p className="text-sm text-muted">{title}</p>
       {items.length > 0 ? (
-        <ul className="mt-3 space-y-2">
+        <ul className="mt-3 space-y-3">
           {items.map((item) => (
-            <li key={item.key} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <Link
-                href={`/articles/${encodeURIComponent(item.article.slug)}`}
-                className="text-sm text-accent hover:underline"
-              >
-                {item.article.title}
-              </Link>
-              {item.meta && <span className="text-xs text-muted">{item.meta}</span>}
+            <li key={item.key} className="flex items-center gap-3">
+              {item.article.cover_image_url && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.article.cover_image_url}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-md object-cover"
+                />
+              )}
+              <div className="min-w-0">
+                <Link
+                  href={`/articles/${encodeURIComponent(item.article.slug)}`}
+                  className="block truncate text-sm text-accent hover:underline"
+                >
+                  {item.article.title}
+                </Link>
+                {item.meta && <span className="text-xs text-muted">{item.meta}</span>}
+              </div>
             </li>
           ))}
         </ul>

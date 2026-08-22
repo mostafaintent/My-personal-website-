@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export interface ArticleRef {
   slug: string;
   title: string;
+  cover_image_url: string | null;
 }
 
 // تعداد لایکِ یک مقاله، برای همه (حتی مهمان) — از تابع SECURITY DEFINER
@@ -65,7 +66,7 @@ export async function getFavoriteArticles(userId: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("article_favorites")
-    .select("id, created_at, article:articles(slug, title)")
+    .select("id, created_at, article:articles(slug, title, cover_image_url)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   return joinedArticles(
@@ -77,7 +78,7 @@ export async function getLikedArticles(userId: string) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("article_likes")
-    .select("id, created_at, article:articles(slug, title)")
+    .select("id, created_at, article:articles(slug, title, cover_image_url)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   return joinedArticles(
@@ -89,7 +90,7 @@ export async function getRecentlyViewedArticles(userId: string, limit = 8) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("article_views")
-    .select("id, last_viewed_at, article:articles(slug, title)")
+    .select("id, last_viewed_at, article:articles(slug, title, cover_image_url)")
     .eq("user_id", userId)
     .order("last_viewed_at", { ascending: false })
     .limit(limit);
@@ -102,7 +103,7 @@ export async function getReadArticles(userId: string, limit = 20) {
   const supabase = await createClient();
   const { data } = await supabase
     .from("article_reads")
-    .select("id, read_at, article:articles(slug, title)")
+    .select("id, read_at, article:articles(slug, title, cover_image_url)")
     .eq("user_id", userId)
     .order("read_at", { ascending: false })
     .limit(limit);

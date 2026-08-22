@@ -59,7 +59,7 @@ export default function ArticleInteractions({
         }`}
       >
         <Heart size={16} fill={liked ? "currentColor" : "none"} />
-        {count.toLocaleString("fa-IR")}
+        {liked ? "پسندیده‌اید" : "پسندیدن"} · {count.toLocaleString("fa-IR")}
       </button>
       <button
         type="button"
