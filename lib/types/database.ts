@@ -111,6 +111,34 @@ export type CategoryRow = {
   created_at: string;
 };
 
+export type ArticleFavoriteRow = {
+  id: string;
+  user_id: string;
+  article_id: string;
+  created_at: string;
+};
+
+export type ArticleLikeRow = {
+  id: string;
+  user_id: string;
+  article_id: string;
+  created_at: string;
+};
+
+export type ArticleViewRow = {
+  id: string;
+  user_id: string;
+  article_id: string;
+  last_viewed_at: string;
+};
+
+export type ArticleReadRow = {
+  id: string;
+  user_id: string;
+  article_id: string;
+  read_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -171,8 +199,37 @@ export type Database = {
         Update: Partial<CategoryRow>;
         Relationships: [];
       };
+      article_favorites: {
+        Row: ArticleFavoriteRow;
+        Insert: Partial<ArticleFavoriteRow> & { user_id: string; article_id: string };
+        Update: Partial<ArticleFavoriteRow>;
+        Relationships: [];
+      };
+      article_likes: {
+        Row: ArticleLikeRow;
+        Insert: Partial<ArticleLikeRow> & { user_id: string; article_id: string };
+        Update: Partial<ArticleLikeRow>;
+        Relationships: [];
+      };
+      article_views: {
+        Row: ArticleViewRow;
+        Insert: Partial<ArticleViewRow> & { user_id: string; article_id: string };
+        Update: Partial<ArticleViewRow>;
+        Relationships: [];
+      };
+      article_reads: {
+        Row: ArticleReadRow;
+        Insert: Partial<ArticleReadRow> & { user_id: string; article_id: string };
+        Update: Partial<ArticleReadRow>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      get_article_like_count: {
+        Args: { p_article_id: string };
+        Returns: number;
+      };
+    };
   };
 };

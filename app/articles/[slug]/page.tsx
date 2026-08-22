@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
@@ -6,12 +7,15 @@ import Comments from "@/components/Comments";
 import ShareBar from "@/components/ShareBar";
 import Sidebar from "@/components/Sidebar";
 import Tag from "@/components/Tag";
+import ArticleInteractions from "@/components/ArticleInteractions";
+import ReadTracker from "@/components/ReadTracker";
 import { getArticleBySlug } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
 import { formatJalaliDate } from "@/lib/format";
 import { sanitizeArticleHtml, stripHtmlToText } from "@/lib/sanitize";
+import { getArticleLikeCount, getUserArticleFlags, logArticleView } from "@/lib/interactions";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +42,23 @@ export default async function ArticlePage({
   const current = await getCurrentUser();
   const unlocked = await hasAccess(current?.id ?? null, article);
   const settings = await getSiteSettings();
+
+  const [likeCount, flags] = await Promise.all([
+    getArticleLikeCount(article.id),
+    current
+      ? getUserArticleFlags(current.id, article.id)
+      : Promise.resolve({ liked: false, favorited: false }),
+  ]);
+
+  // ثبت بازدید نباید رندر صفحه رو کند کنه؛ با after() بعد از ارسالِ
+  // پاسخ به کاربر اجرا می‌شه، نه قبلش. userId همین بالا (قبل از after)
+  // خونده شده چون داخل Server Component نمی‌شه از کوکی/هدر داخل
+  // after() استفاده کرد.
+  if (current) {
+    const userId = current.id;
+    const articleId = article.id;
+    after(() => logArticleView(userId, articleId));
+  }
 
   return (
     <Container wide className="py-14">
@@ -69,6 +90,8 @@ export default async function ArticlePage({
             dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
           />
 
+          {unlocked && current && <ReadTracker articleId={article.id} />}
+
           {article.premium && !unlocked && (
             <PaywallGate
               priceIRR={article.priceIRR}
@@ -76,6 +99,17 @@ export default async function ArticlePage({
               isLoggedIn={Boolean(current)}
             />
           )}
+
+          <div className="mt-8 flex justify-center">
+            <ArticleInteractions
+              articleId={article.id}
+              articleSlug={article.slug}
+              isLoggedIn={Boolean(current)}
+              initialLiked={flags.liked}
+              initialFavorited={flags.favorited}
+              likeCount={likeCount}
+            />
+          </div>
 
           {article.tags.length > 0 && (
             <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm">

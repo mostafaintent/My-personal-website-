@@ -5,9 +5,49 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { formatJalaliDate } from "@/lib/format";
 import { signOut } from "@/lib/actions/auth";
+import {
+  getFavoriteArticles,
+  getLikedArticles,
+  getRecentlyViewedArticles,
+  getReadArticles,
+  type ArticleRef,
+} from "@/lib/interactions";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "حساب من" };
+
+function ArticleListCard({
+  title,
+  emptyText,
+  items,
+}: {
+  title: string;
+  emptyText: string;
+  items: { key: string; article: ArticleRef; meta?: string }[];
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-6">
+      <p className="text-sm text-muted">{title}</p>
+      {items.length > 0 ? (
+        <ul className="mt-3 space-y-2">
+          {items.map((item) => (
+            <li key={item.key} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <Link
+                href={`/articles/${encodeURIComponent(item.article.slug)}`}
+                className="text-sm text-accent hover:underline"
+              >
+                {item.article.title}
+              </Link>
+              {item.meta && <span className="text-xs text-muted">{item.meta}</span>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-3 text-sm text-muted">{emptyText}</p>
+      )}
+    </div>
+  );
+}
 
 export default async function AccountPage() {
   const current = await getCurrentUser();
@@ -15,32 +55,47 @@ export default async function AccountPage() {
 
   const supabase = await createClient();
 
-  const { data: purchasesData } = await supabase
-    .from("purchases")
-    .select("id, amount, currency, status, article:articles(slug, title)")
-    .eq("user_id", current.id)
-    .eq("status", "completed");
+  const [
+    { data: purchasesData },
+    { data: subscription },
+    { data: commentsData },
+    favorites,
+    likes,
+    recentlyViewed,
+    reads,
+  ] = await Promise.all([
+    supabase
+      .from("purchases")
+      .select("id, amount, currency, status, article:articles(slug, title)")
+      .eq("user_id", current.id)
+      .eq("status", "completed"),
+    supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", current.id)
+      .eq("status", "active")
+      .order("current_period_end", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("comments")
+      .select("id, body, created_at, article:articles(slug, title)")
+      .eq("user_id", current.id)
+      .order("created_at", { ascending: false }),
+    getFavoriteArticles(current.id),
+    getLikedArticles(current.id),
+    getRecentlyViewedArticles(current.id),
+    getReadArticles(current.id),
+  ]);
+
   const purchases = purchasesData as unknown as
     | { id: string; article: { slug: string; title: string } | null }[]
     | null;
-
-  const { data: subscription } = await supabase
-    .from("subscriptions")
-    .select("*")
-    .eq("user_id", current.id)
-    .eq("status", "active")
-    .order("current_period_end", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const { data: commentsData } = await supabase
-    .from("comments")
-    .select("id, body, created_at, article:articles(slug, title)")
-    .eq("user_id", current.id)
-    .order("created_at", { ascending: false });
   const comments = commentsData as unknown as
     | { id: string; body: string; created_at: string; article: { slug: string; title: string } | null }[]
     | null;
+
+  const lastViewed = recentlyViewed[0];
 
   return (
     <Container className="py-14">
@@ -61,6 +116,18 @@ export default async function AccountPage() {
         </form>
       </div>
 
+      {lastViewed && (
+        <p className="mb-8 text-sm text-muted">
+          آخرین فعالیت: بازدید از{" "}
+          <Link
+            href={`/articles/${encodeURIComponent(lastViewed.article.slug)}`}
+            className="text-accent hover:underline"
+          >
+            {lastViewed.article.title}
+          </Link>
+        </p>
+      )}
+
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-6">
           <p className="text-sm text-muted">مقاله‌های خریداری‌شده</p>
@@ -79,6 +146,9 @@ export default async function AccountPage() {
               </li>
             ))}
           </ul>
+          {/* بخش «خریدها»/«محتوای خریداری‌شده» فعلاً همینه؛ در آینده اگه
+              محتوای پولی جدید (کتابچه، PDF و...) اضافه بشه، همین بخش
+              گسترش پیدا می‌کنه. */}
         </div>
 
         <div className="rounded-xl border border-border bg-card p-6">
@@ -100,6 +170,37 @@ export default async function AccountPage() {
             </Link>
           )}
         </div>
+      </div>
+
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <ArticleListCard
+          title="مقالات مورد علاقه"
+          emptyText="هنوز مقاله‌ای را ذخیره نکرده‌اید."
+          items={favorites.map((f) => ({ key: f.id, article: f.article }))}
+        />
+        <ArticleListCard
+          title="پسندیده‌های من"
+          emptyText="هنوز مقاله‌ای را لایک نکرده‌اید."
+          items={likes.map((l) => ({ key: l.id, article: l.article }))}
+        />
+        <ArticleListCard
+          title="اخیراً دیده‌شده"
+          emptyText="هنوز مقاله‌ای ندیده‌اید."
+          items={recentlyViewed.map((v) => ({
+            key: v.id,
+            article: v.article,
+            meta: formatJalaliDate(v.last_viewed_at),
+          }))}
+        />
+        <ArticleListCard
+          title="مقالات خوانده‌شده"
+          emptyText="هنوز مقاله‌ای را کامل نخوانده‌اید."
+          items={reads.map((r) => ({
+            key: r.id,
+            article: r.article,
+            meta: formatJalaliDate(r.read_at),
+          }))}
+        />
       </div>
 
       <h2 className="mt-12 mb-4 text-xl font-bold">نظرات من</h2>
