@@ -14,7 +14,7 @@ import { hasAccess } from "@/lib/payments/access";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
 import { formatJalaliDate } from "@/lib/format";
-import { sanitizeArticleHtml, stripHtmlToText } from "@/lib/sanitize";
+import { sanitizeArticleHtml, sanitizeExcerptHtml, stripHtmlToText } from "@/lib/sanitize";
 import { getArticleLikeCount, getUserArticleFlags, logArticleView } from "@/lib/interactions";
 
 export const dynamic = "force-dynamic";
@@ -96,10 +96,23 @@ export default async function ArticlePage({
             />
           </div>
 
-          <div
-            className="prose-article"
-            dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
-          />
+          {/* محتوای کامل فقط وقتی رندر می‌شه که مقاله رایگان باشه یا کاربر
+              بهش دسترسی داشته باشه — همون الگوی ArticleFullCard؛ برخلاف
+              نسخه‌ی قبلی، برای مقاله‌ی قفل، اصلاً article.content به RSC
+              payload اضافه نمی‌شه، نه این‌که فقط با CSS/کلاینت مخفی بشه. */}
+          {!article.premium || unlocked ? (
+            <div
+              className="prose-article"
+              dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
+            />
+          ) : (
+            article.excerpt && (
+              <div
+                className="leading-8 text-muted"
+                dangerouslySetInnerHTML={{ __html: sanitizeExcerptHtml(article.excerpt) }}
+              />
+            )
+          )}
 
           {unlocked && current && <ReadTracker articleId={article.id} />}
 

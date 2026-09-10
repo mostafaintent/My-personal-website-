@@ -45,6 +45,9 @@ export default async function LoginPage({
             className="rounded-lg border border-border bg-card px-4 py-2.5 outline-none focus:border-accent"
           />
         </label>
+        <Link href="/forgot-password" className="self-start text-sm text-accent hover:underline">
+          رمز عبور را فراموش کرده‌اید؟
+        </Link>
         <button
           type="submit"
           className="mt-2 rounded-lg bg-accent px-4 py-2.5 font-medium text-white transition-opacity hover:opacity-90"

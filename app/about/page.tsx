@@ -1,16 +1,18 @@
 import Container from "@/components/Container";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteSettings } from "@/lib/settings";
 
 export const metadata = {
   title: "درباره",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSiteSettings();
+
   return (
     <Container narrow className="py-14">
-      <h1 className="mb-8 text-3xl font-bold">درباره‌ی {siteConfig.authorName}</h1>
+      <h1 className="mb-8 text-3xl font-bold">درباره‌ی {settings.authorName}</h1>
       <div className="prose-article">
-        <p>{siteConfig.authorBio}</p>
+        <p>{settings.bio}</p>
         <p>
           این بخش قابل ویرایشه — کافیه محتوای این صفحه رو با شرح‌حال واقعی
           خودتون جایگزین کنید. فایل مربوطه: <code>app/about/page.tsx</code>.

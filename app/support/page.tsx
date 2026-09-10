@@ -3,16 +3,18 @@ import Container from "@/components/Container";
 import { paymentProviders } from "@/lib/payments/providers";
 import { subscriptionPlans } from "@/lib/payments/plans";
 import { formatToman, formatUSD } from "@/lib/format";
-import { siteConfig } from "@/lib/site-config";
+import { getSiteSettings } from "@/lib/settings";
 
 export const metadata = {
   title: "حمایت",
 };
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const settings = await getSiteSettings();
+
   return (
     <Container narrow className="py-14">
-      <h1 className="mb-6 text-3xl font-bold">حمایت از {siteConfig.name}</h1>
+      <h1 className="mb-6 text-3xl font-bold">حمایت از {settings.siteName}</h1>
       <div className="prose-article">
         <p>
           بیشتر نوشته‌های این سایت رایگان هستند و همیشه رایگان خواهند ماند.
