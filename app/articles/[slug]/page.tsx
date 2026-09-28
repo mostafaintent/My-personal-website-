@@ -85,17 +85,6 @@ export default async function ArticlePage({
             )}
           </header>
 
-          <div className="mb-8 flex justify-center">
-            <ArticleInteractions
-              articleId={article.id}
-              articleSlug={article.slug}
-              isLoggedIn={Boolean(current)}
-              initialLiked={flags.liked}
-              initialFavorited={flags.favorited}
-              likeCount={likeCount}
-            />
-          </div>
-
           {/* محتوای کامل فقط وقتی رندر می‌شه که مقاله رایگان باشه یا کاربر
               بهش دسترسی داشته باشه — همون الگوی ArticleFullCard؛ برخلاف
               نسخه‌ی قبلی، برای مقاله‌ی قفل، اصلاً article.content به RSC
