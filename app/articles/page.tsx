@@ -1,16 +1,39 @@
+import type { Metadata } from "next";
 import Container from "@/components/Container";
 import ArticleCard from "@/components/ArticleCard";
 import Sidebar from "@/components/Sidebar";
 import Pagination from "@/components/Pagination";
 import { getAllArticles, getArticlesByCategory, searchArticles } from "@/lib/articles";
+import { getSiteUrl } from "@/lib/site-url";
+import { buildArchiveCanonicalAndRobots } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "مقاله‌ها" };
 
 // این صفحه (آرشیو/دسته‌بندی/جست‌وجو) برخلاف صفحه‌ی اصلی، متن کامل مقاله رو
 // نشون نمی‌ده — فقط خلاصه — پس تعداد بیشتری در هر صفحه جا می‌شه؛ مستقل از
 // تنظیم «تعداد مقاله در هر صفحه» که مخصوص صفحه‌ی اصلیه.
 const PER_PAGE = 10;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; q?: string; page?: string }>;
+}): Promise<Metadata> {
+  const { category, q, page } = await searchParams;
+  const { canonical, isFilterVariant } = buildArchiveCanonicalAndRobots({
+    siteUrl: getSiteUrl(),
+    basePath: "/articles",
+    q,
+    category,
+    page,
+  });
+
+  return {
+    title: q ? `نتیجه‌ی جست‌وجو برای «${q}»` : category ? category : "مقاله‌ها",
+    alternates: { canonical },
+    robots: isFilterVariant ? { index: false, follow: true } : undefined,
+  };
+}
 
 export default async function ArticlesPage({
   searchParams,

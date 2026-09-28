@@ -5,7 +5,7 @@ export default async function Footer() {
   const settings = await getSiteSettings();
 
   return (
-    <footer className="mt-24 border-t border-border py-10">
+    <footer className="site-footer mt-24 border-t border-border py-10">
       <Container className="flex flex-col items-center gap-4 text-center text-sm text-muted">
         {settings.socialLinks.length > 0 && (
           <div className="flex flex-wrap justify-center gap-5">
