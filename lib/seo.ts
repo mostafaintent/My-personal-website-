@@ -90,10 +90,12 @@ export function jsonLdToScriptString(data: unknown): string {
 }
 
 // سیاست سئوی /articles: آرشیو خام (بدون پارامتر، یا فقط با page) مثل یک
-// صفحه‌ی عادی ایندکس می‌شه؛ حالت‌های جست‌وجو/دسته‌بندی («q» یا «category»)
-// چون همین مسیر رو با محتوای فیلترشده تکرار می‌کنن، به‌عنوان صفحه‌ی فرود
-// مستقل معرفی نمی‌شن — noindex,follow با canonical به خودشون (نه به آرشیو
-// خام؛ چون واقعاً محتوای یکسانی نیستن).
+// صفحه‌ی عادی ایندکس می‌شه، با canonical به خودش (شامل ?page=N اگر بود).
+// حالت‌های جست‌وجو/دسته‌بندی («q» یا «category»، با هر ترکیب/صفحه‌ای) صفحه‌ی
+// فرود مستقل نیستن — نه‌فقط noindex,follow، بلکه canonical هم به خودِ آرشیوِ
+// خام (بدون querystring) اشاره می‌کنه، نه به خودشون؛ چون هدف اینه که این
+// URLها اصلاً واریانت مستقلی برای سئو حساب نشن (نه فقط ایندکس نشن) — ساده‌ترین
+// سیاستِ سازگار با این‌که آرشیو اصلی «همیشه» همون یک مقصد canonical رو داشته باشه.
 export interface ArchiveQueryMetadataInput {
   siteUrl: string;
   basePath: string;
@@ -110,14 +112,16 @@ export interface ArchiveQueryMetadataResult {
 export function buildArchiveCanonicalAndRobots(
   input: ArchiveQueryMetadataInput
 ): ArchiveQueryMetadataResult {
-  const params = new URLSearchParams();
-  if (input.q) params.set("q", input.q);
-  if (input.category) params.set("category", input.category);
-  if (input.page && input.page !== "1") params.set("page", input.page);
-
-  const qs = params.toString();
-  const canonical = `${input.siteUrl}${input.basePath}${qs ? `?${qs}` : ""}`;
   const isFilterVariant = Boolean(input.q || input.category);
 
-  return { canonical, isFilterVariant };
+  if (isFilterVariant) {
+    return { canonical: `${input.siteUrl}${input.basePath}`, isFilterVariant: true };
+  }
+
+  const params = new URLSearchParams();
+  if (input.page && input.page !== "1") params.set("page", input.page);
+  const qs = params.toString();
+  const canonical = `${input.siteUrl}${input.basePath}${qs ? `?${qs}` : ""}`;
+
+  return { canonical, isFilterVariant: false };
 }

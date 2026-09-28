@@ -29,4 +29,16 @@ describe("tagFromRouteParam", () => {
   it("trims the decoded value", () => {
     expect(tagFromRouteParam(encodeURIComponent("  عرفان  "))).toBe("عرفان");
   });
+
+  it("returns null (not a throw) for malformed percent-encoding, so the route can 404 instead of 500", () => {
+    // یک "%" تنها یا دنباله‌ی ناقص، decodeURIComponent رو با URIError می‌ترکونه.
+    expect(tagFromRouteParam("%")).toBeNull();
+    expect(tagFromRouteParam("%E0%A4%A")).toBeNull();
+    expect(() => tagFromRouteParam("%")).not.toThrow();
+  });
+
+  it("returns null for an empty or whitespace-only slug", () => {
+    expect(tagFromRouteParam("")).toBeNull();
+    expect(tagFromRouteParam(encodeURIComponent("   "))).toBeNull();
+  });
 });

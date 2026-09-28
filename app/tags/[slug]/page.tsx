@@ -20,6 +20,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const tag = tagFromRouteParam(slug);
+  if (!tag) return {};
+
   const canonical = `${getSiteUrl()}/tags/${encodeURIComponent(tag)}`;
 
   return {

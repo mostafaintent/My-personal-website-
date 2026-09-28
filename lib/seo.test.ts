@@ -112,19 +112,27 @@ describe("buildArchiveCanonicalAndRobots", () => {
     expect(result.isFilterVariant).toBe(false);
   });
 
-  it("flags a search query (?q=) as a non-canonical filter variant", () => {
+  it("flags a search query (?q=) as a filter variant and canonicalizes to the bare archive", () => {
     const result = buildArchiveCanonicalAndRobots({ siteUrl, basePath, q: "عرفان" });
     expect(result.isFilterVariant).toBe(true);
-    expect(result.canonical).toBe(`${siteUrl}/articles?q=${encodeURIComponent("عرفان")}`);
+    expect(result.canonical).toBe(`${siteUrl}/articles`);
   });
 
-  it("flags a category filter as a non-canonical filter variant", () => {
+  it("flags a category filter as a filter variant and canonicalizes to the bare archive", () => {
     const result = buildArchiveCanonicalAndRobots({ siteUrl, basePath, category: "فلسفه" });
     expect(result.isFilterVariant).toBe(true);
+    expect(result.canonical).toBe(`${siteUrl}/articles`);
   });
 
-  it("self-canonicalizes filter variants instead of pointing at the bare archive", () => {
-    const result = buildArchiveCanonicalAndRobots({ siteUrl, basePath, q: "test", page: "2" });
-    expect(result.canonical).toBe(`${siteUrl}/articles?q=test&page=2`);
+  it("canonicalizes any filter+pagination combination to the bare archive, not to itself", () => {
+    const result = buildArchiveCanonicalAndRobots({
+      siteUrl,
+      basePath,
+      q: "test",
+      category: "فلسفه",
+      page: "2",
+    });
+    expect(result.canonical).toBe(`${siteUrl}/articles`);
+    expect(result.isFilterVariant).toBe(true);
   });
 });
