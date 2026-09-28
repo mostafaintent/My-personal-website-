@@ -24,7 +24,12 @@ export default function ArticleCard({ article }: { article: ArticleMeta }) {
       </h2>
       {article.excerpt && (
         <div
-          className="mt-3 leading-8 text-muted"
+          // line-clamp-6 فقط جلوی خلاصه‌ی خیلی بلند رو می‌گیره تا ارتفاع
+          // کارت‌ها در آرشیو (که همیشه دو ستونه‌ست) خیلی نامتوازن نشه؛ برای
+          // خلاصه‌های معمولی (که معمولاً کوتاه‌تر از ۶ خط‌ان) هیچ تغییری
+          // دیده نمی‌شه. [&_*]:inline تگ‌های بلوکی احتمالی (مثل <p>) رو
+          // مسطح می‌کنه تا clamp روی کل متن یکسان عمل کنه.
+          className="mt-3 line-clamp-6 leading-8 text-muted [&_*]:inline"
           dangerouslySetInnerHTML={{ __html: sanitizeExcerptHtml(article.excerpt) }}
         />
       )}

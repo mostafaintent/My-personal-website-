@@ -32,10 +32,12 @@ function RelatedArticleCard({ article }: { article: ArticleMeta }) {
       </h3>
       {article.excerpt && (
         <div
+          // خلاصه محتوای مهمیه؛ فقط جلوی طولانی‌شدنِ بی‌حدوحصر گرفته می‌شه
+          // (حدود ۶ خط)، نه این‌که به چند کلمه‌ی بی‌معنا کوتاه بشه.
           // [&_*]:inline تگ‌های بلوکی احتمالی (مثل <p>) رو داخل همین متن
           // مسطح می‌کنه تا line-clamp روی کل متن یکسان عمل کنه، نه هر
           // پاراگراف جدا.
-          className="line-clamp-3 mt-2 text-sm leading-7 text-muted [&_*]:inline"
+          className="line-clamp-6 mt-2 text-sm leading-7 text-muted [&_*]:inline"
           dangerouslySetInnerHTML={{ __html: sanitizeExcerptHtml(article.excerpt) }}
         />
       )}
@@ -44,17 +46,17 @@ function RelatedArticleCard({ article }: { article: ArticleMeta }) {
 }
 
 // اگر مطلب مرتبطِ معناداری پیدا نشد، اصلاً چیزی رندر نمی‌شه (نه یک بخش خالی).
-// grid با auto-fit/minmax عرض واقعیِ خودِ ستون محتوا رو مبنا قرار می‌ده (نه
-// breakpoint‌های viewport) — چون این بخش همیشه داخل یک ستون باریک
-// (max-w-2xl مقاله) قرار داره، حتی روی صفحه‌های عریض. همین باعث می‌شه
-// روی موبایل واقعی خودکار یک‌ستونه بشه و جای اضافه هدر نره.
+// حداکثر همیشه ۲ ستون — هرگز ۳ ستون نه، چون این بخش همیشه داخل ستون باریک
+// (max-w-2xl) صفحه‌ی مقاله‌ست و ۳ ستون یعنی کارت‌های بیش‌ازحد باریک. اگر ۳
+// مطلب مرتبط باشه، کارت سوم طبق رفتار پیش‌فرض grid خودش می‌ره ردیف بعد،
+// فقط توی یک ستون (نه stretch‌شده روی کل عرض).
 export default function RelatedArticles({ articles }: { articles: ArticleMeta[] }) {
   if (articles.length === 0) return null;
 
   return (
     <section className="mt-16 border-t border-border pt-10 print:hidden">
       <h2 className="mb-8 text-center text-xl font-bold">مطالب مرتبط</h2>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-[repeat(auto-fit,minmax(200px,1fr))]">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {articles.map((article) => (
           <RelatedArticleCard key={article.slug} article={article} />
         ))}
