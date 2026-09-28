@@ -7,7 +7,7 @@ export default async function Header() {
   const settings = await getSiteSettings();
 
   return (
-    <header>
+    <header className="site-header">
       <div className="mx-[0.5cm] mb-[1cm] mt-[0.5cm] text-center sm:mx-[2cm]">
         <MobileNavDrawer>
           <Sidebar />
