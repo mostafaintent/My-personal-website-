@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { after } from "next/server";
+import type { Metadata } from "next";
 import Container from "@/components/Container";
 import PremiumBadge from "@/components/PremiumBadge";
 import PaywallGate from "@/components/PaywallGate";
@@ -9,12 +10,15 @@ import Sidebar from "@/components/Sidebar";
 import Tag from "@/components/Tag";
 import ArticleInteractions from "@/components/ArticleInteractions";
 import ReadTracker from "@/components/ReadTracker";
-import { getArticleBySlug } from "@/lib/articles";
+import RelatedArticles from "@/components/RelatedArticles";
+import { getArticleBySlug, getRelatedArticles } from "@/lib/articles";
 import { hasAccess } from "@/lib/payments/access";
 import { getCurrentUser } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/settings";
+import { getSiteUrl } from "@/lib/site-url";
 import { formatJalaliDate } from "@/lib/format";
 import { sanitizeArticleHtml, sanitizeExcerptHtml, stripHtmlToText } from "@/lib/sanitize";
+import { buildArticleJsonLd, buildArticleMetadata, jsonLdToScriptString } from "@/lib/seo";
 import { getArticleLikeCount, getUserArticleFlags, logArticleView } from "@/lib/interactions";
 
 export const dynamic = "force-dynamic";
@@ -23,11 +27,21 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticleBySlug(decodeURIComponent(slug));
   if (!article) return {};
-  return { title: article.title, description: stripHtmlToText(article.excerpt) };
+
+  const settings = await getSiteSettings();
+  return buildArticleMetadata({
+    title: article.title,
+    descriptionText: stripHtmlToText(article.excerpt),
+    siteUrl: getSiteUrl(),
+    slug: article.slug,
+    coverImageUrl: article.coverImageUrl,
+    publishedAt: article.publishedAt,
+    authorName: settings.authorName,
+  });
 }
 
 export default async function ArticlePage({
@@ -43,12 +57,24 @@ export default async function ArticlePage({
   const unlocked = await hasAccess(current?.id ?? null, article);
   const settings = await getSiteSettings();
 
-  const [likeCount, flags] = await Promise.all([
+  const [likeCount, flags, relatedArticles] = await Promise.all([
     getArticleLikeCount(article.id),
     current
       ? getUserArticleFlags(current.id, article.id)
       : Promise.resolve({ liked: false, favorited: false }),
+    getRelatedArticles(article),
   ]);
+
+  const jsonLd = buildArticleJsonLd({
+    title: article.title,
+    slug: article.slug,
+    siteUrl: getSiteUrl(),
+    descriptionText: stripHtmlToText(article.excerpt),
+    coverImageUrl: article.coverImageUrl,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
+    authorName: settings.authorName,
+  });
 
   // ثبت بازدید نباید رندر صفحه رو کند کنه؛ با after() بعد از ارسالِ
   // پاسخ به کاربر اجرا می‌شه، نه قبلش. userId همین بالا (قبل از after)
@@ -61,9 +87,13 @@ export default async function ArticlePage({
   }
 
   return (
-    <Container wide className="py-14">
+    <Container wide className="py-14 article-print-scope">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdToScriptString(jsonLd) }}
+      />
       <div className="grid gap-12 sm:grid-cols-[1fr_4fr]">
-        <div className="hidden min-w-0 sm:block">
+        <div className="hidden min-w-0 sm:block print:hidden">
           <Sidebar />
         </div>
 
@@ -85,7 +115,7 @@ export default async function ArticlePage({
             )}
           </header>
 
-          <div className="mb-8 flex justify-center">
+          <div className="mb-8 flex justify-center print:hidden">
             <ArticleInteractions
               articleId={article.id}
               articleSlug={article.slug}
@@ -117,14 +147,16 @@ export default async function ArticlePage({
           {unlocked && current && <ReadTracker articleId={article.id} />}
 
           {article.premium && !unlocked && (
-            <PaywallGate
-              priceIRR={article.priceIRR}
-              priceUSD={article.priceUSD}
-              isLoggedIn={Boolean(current)}
-            />
+            <div className="print:hidden">
+              <PaywallGate
+                priceIRR={article.priceIRR}
+                priceUSD={article.priceUSD}
+                isLoggedIn={Boolean(current)}
+              />
+            </div>
           )}
 
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex justify-center print:hidden">
             <ArticleInteractions
               articleId={article.id}
               articleSlug={article.slug}
@@ -136,7 +168,7 @@ export default async function ArticlePage({
           </div>
 
           {article.tags.length > 0 && (
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 text-sm print:hidden">
               <span className="text-muted">برچسب‌ها:</span>
               {article.tags.map((tag) => (
                 <Tag key={tag} label={tag} />
@@ -144,13 +176,21 @@ export default async function ArticlePage({
             </div>
           )}
 
-          <ShareBar
-            path={`/articles/${encodeURIComponent(article.slug)}`}
-            title={article.title}
-            enabled={settings.shareLinks}
-          />
+          <div className="print:hidden">
+            <ShareBar
+              path={`/articles/${encodeURIComponent(article.slug)}`}
+              title={article.title}
+              enabled={settings.shareLinks}
+            />
+          </div>
 
-          {unlocked && <Comments articleId={article.id} articleSlug={article.slug} />}
+          <RelatedArticles articles={relatedArticles} />
+
+          {unlocked && (
+            <div className="print:hidden">
+              <Comments articleId={article.id} articleSlug={article.slug} />
+            </div>
+          )}
         </article>
       </div>
     </Container>

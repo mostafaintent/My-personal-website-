@@ -164,6 +164,33 @@ body {
   margin-top: 0.75em;
 }
 
+/* چاپِ صفحه‌ی مقاله: هدر/فوتر سراسری سایت بیرون از این صفحه (توی
+   layout ریشه) رندر می‌شن، پس نمی‌شه رویشون کلاس print:hidden مستقیم
+   گذاشت؛ به‌جاش با :has() فقط وقتی صفحه‌ی جاری شامل .article-print-scope
+   باشه (یعنی همین صفحه‌ی مقاله) مخفی‌شون می‌کنیم — صفحه‌های دیگه‌ی سایت
+   دست‌نخورده می‌مونن. بقیه‌ی عناصرِ غیرضروری (سایدبار، دکمه‌های تعامل،
+   ShareBar، نظرات، مطالب مرتبط) مستقیماً توی همون کامپوننت‌ها با کلاس
+   Tailwind ‌ی print:hidden مخفی شدن. */
+@media print {
+  body:has(.article-print-scope) .site-header,
+  body:has(.article-print-scope) .site-footer {
+    display: none;
+  }
+
+  .prose-article h1,
+  .prose-article h2,
+  .prose-article h3,
+  .prose-article h4 {
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  .prose-article img {
+    break-inside: avoid;
+    max-width: 100% !important;
+  }
+}
+
 .tiptap-editable {
   line-height: 1.9;
 }

@@ -1,0 +1,32 @@
+import { describe, expect, it } from "vitest";
+import { tagFromRouteParam, tagHref } from "./tags";
+
+describe("tagHref", () => {
+  it("builds a /tags/<encoded-tag> url for a simple tag", () => {
+    expect(tagHref("فلسفه")).toBe(`/tags/${encodeURIComponent("فلسفه")}`);
+  });
+
+  it("trims whitespace before encoding", () => {
+    expect(tagHref("  یادداشت  ")).toBe(`/tags/${encodeURIComponent("یادداشت")}`);
+  });
+
+  it("safely encodes tags containing special/reserved URL characters", () => {
+    const tag = "روان‌شناسی/تحلیلی";
+    const href = tagHref(tag);
+    expect(href).toBe(`/tags/${encodeURIComponent(tag)}`);
+    // یک اسلش وسط تگ نباید یک سگمنت مسیر جدید بسازه.
+    expect(href.split("/")).toHaveLength(3); // "", "tags", "<encoded>"
+  });
+});
+
+describe("tagFromRouteParam", () => {
+  it("is the exact inverse of tagHref for round-tripping", () => {
+    const original = "فلسفه و تاریخ";
+    const encoded = encodeURIComponent(original);
+    expect(tagFromRouteParam(encoded)).toBe(original);
+  });
+
+  it("trims the decoded value", () => {
+    expect(tagFromRouteParam(encodeURIComponent("  عرفان  "))).toBe("عرفان");
+  });
+});
