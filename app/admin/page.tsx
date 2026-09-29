@@ -41,18 +41,43 @@ function StatCard({
 }
 
 // همون StatCard، به‌علاوه‌ی درصد تغییر نسبت به بازهٔ قبلی (اگر بازهٔ قبلی
-// صفر بود، به‌جای یک درصدِ گمراه‌کننده، پیام خنثی نشون می‌ده).
+// صفر بود، به‌جای یک درصدِ گمراه‌کننده، پیام خنثی نشون می‌ده). حالت
+// horizontal برای وقتی که کارت به‌جای قرارگرفتن کنار کارت‌های دیگه، تمام
+// عرض ردیف رو می‌گیره — روی صفحه‌های باریک‌تر (مثل آیپد) خواناتره.
 function StatCardWithTrend({
   label,
   value,
   percent,
   href,
+  horizontal = false,
 }: {
   label: string;
   value: number;
   percent: number | null;
   href: string;
+  horizontal?: boolean;
 }) {
+  const percentClassName = `text-xs ${percent === null ? "text-muted-light" : percent < 0 ? "text-accent" : "text-foreground"}`;
+  const percentText =
+    percent === null
+      ? "داده‌ی کافی برای مقایسه نیست"
+      : `${percent >= 0 ? "+" : ""}${percent.toLocaleString("fa-IR")}٪ نسبت به هفته‌ی قبل`;
+
+  if (horizontal) {
+    return (
+      <Link
+        href={href}
+        className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-6 transition-colors hover:border-accent"
+      >
+        <div>
+          <p className="text-sm text-muted">{label}</p>
+          <p className="mt-1 text-3xl font-bold">{value.toLocaleString("fa-IR")}</p>
+        </div>
+        <p className={percentClassName}>{percentText}</p>
+      </Link>
+    );
+  }
+
   return (
     <Link
       href={href}
@@ -60,11 +85,7 @@ function StatCardWithTrend({
     >
       <p className="text-sm text-muted">{label}</p>
       <p className="mt-2 text-3xl font-bold">{value.toLocaleString("fa-IR")}</p>
-      <p className={`mt-1 text-xs ${percent === null ? "text-muted-light" : percent < 0 ? "text-accent" : "text-foreground"}`}>
-        {percent === null
-          ? "داده‌ی کافی برای مقایسه نیست"
-          : `${percent >= 0 ? "+" : ""}${percent.toLocaleString("fa-IR")}٪ نسبت به هفته‌ی قبل`}
-      </p>
+      <p className={`mt-1 ${percentClassName}`}>{percentText}</p>
     </Link>
   );
 }
@@ -253,18 +274,12 @@ export default async function AdminDashboardPage() {
       <div className="flex flex-col gap-6">
         <div>
           <SectionLabel>رشد هفتگی</SectionLabel>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <StatCardWithTrend
               label="بازدید این هفته"
               value={viewsThisWeek}
               percent={viewsPercent}
               href="/admin/analytics"
-            />
-            <StatCardWithTrend
-              label="نظرات این هفته"
-              value={commentsThisWeek}
-              percent={commentsPercent}
-              href="/admin/comments"
             />
             <StatCardWithTrend
               label="کاربران تازه این هفته"
@@ -275,120 +290,124 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
+        <StatCardWithTrend
+          label="نظرات این هفته"
+          value={commentsThisWeek}
+          percent={commentsPercent}
+          href="/admin/comments"
+          horizontal
+        />
+
         <Widget title="روند بازدید ۱۴ روز اخیر">
           <TrendChart data={viewsDaily} />
         </Widget>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Widget title="مقالات پربازدید">
-            {topViewed.length > 0 ? (
-              <ul className="flex flex-col gap-3 text-sm">
-                {topViewed.map(({ article, count }) => (
-                  <li key={article.id} className="flex items-center justify-between gap-3">
-                    <Link
-                      href={`/admin/articles/${article.id}/edit`}
-                      className="truncate text-foreground hover:text-accent"
-                    >
-                      {article.title}
-                    </Link>
-                    <span className="shrink-0 text-muted">{count.toLocaleString("fa-IR")} بازدید</span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <EmptyRow>هنوز بازدیدی به مقاله‌ای قابل‌تطبیق نبوده.</EmptyRow>
-            )}
-            {unmatchedViews > 0 && (
-              <p className="mt-3 text-xs text-muted-light">
-                {unmatchedViews.toLocaleString("fa-IR")} بازدید مقاله قابل تطبیق با اسلاگ فعلی نبود (مثلاً مقاله‌ی حذف‌شده).
-              </p>
-            )}
-          </Widget>
+        <Widget title="مقالات پربازدید">
+          {topViewed.length > 0 ? (
+            <ul className="flex flex-col gap-3 text-sm">
+              {topViewed.map(({ article, count }) => (
+                <li key={article.id} className="flex items-center justify-between gap-3">
+                  <Link
+                    href={`/admin/articles/${article.id}/edit`}
+                    className="truncate text-foreground hover:text-accent"
+                  >
+                    {article.title}
+                  </Link>
+                  <span className="shrink-0 text-muted">{count.toLocaleString("fa-IR")} بازدید</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyRow>هنوز بازدیدی به مقاله‌ای قابل‌تطبیق نبوده.</EmptyRow>
+          )}
+          {unmatchedViews > 0 && (
+            <p className="mt-3 text-xs text-muted-light">
+              {unmatchedViews.toLocaleString("fa-IR")} بازدید مقاله قابل تطبیق با اسلاگ فعلی نبود (مثلاً مقاله‌ی حذف‌شده).
+            </p>
+          )}
+        </Widget>
 
-          <Widget title="بیشترین لایک و علاقه‌مندی">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="mb-2 text-xs text-muted-light">پرلایک‌ترین</p>
-                {topLiked.length > 0 ? (
-                  <ul className="flex flex-col gap-2 text-sm">
-                    {topLiked.map(({ article, count }) => (
-                      <li key={article.id} className="flex items-center justify-between gap-2">
-                        <Link
-                          href={`/admin/articles/${article.id}/edit`}
-                          className="truncate text-foreground hover:text-accent"
-                        >
-                          {article.title}
-                        </Link>
-                        <span className="shrink-0 text-xs text-muted">{count.toLocaleString("fa-IR")}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <EmptyRow>هنوز لایکی نیست.</EmptyRow>
-                )}
-              </div>
-              <div>
-                <p className="mb-2 text-xs text-muted-light">پرعلاقه‌مندی‌ترین</p>
-                {topFavorited.length > 0 ? (
-                  <ul className="flex flex-col gap-2 text-sm">
-                    {topFavorited.map(({ article, count }) => (
-                      <li key={article.id} className="flex items-center justify-between gap-2">
-                        <Link
-                          href={`/admin/articles/${article.id}/edit`}
-                          className="truncate text-foreground hover:text-accent"
-                        >
-                          {article.title}
-                        </Link>
-                        <span className="shrink-0 text-xs text-muted">{count.toLocaleString("fa-IR")}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <EmptyRow>هنوز علاقه‌مندی‌ای نیست.</EmptyRow>
-                )}
-              </div>
+        <Widget title="بیشترین لایک و علاقه‌مندی">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="mb-2 text-xs text-muted-light">پرلایک‌ترین</p>
+              {topLiked.length > 0 ? (
+                <ul className="flex flex-col gap-2 text-sm">
+                  {topLiked.map(({ article, count }) => (
+                    <li key={article.id} className="flex items-center justify-between gap-2">
+                      <Link
+                        href={`/admin/articles/${article.id}/edit`}
+                        className="truncate text-foreground hover:text-accent"
+                      >
+                        {article.title}
+                      </Link>
+                      <span className="shrink-0 text-xs text-muted">{count.toLocaleString("fa-IR")}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <EmptyRow>هنوز لایکی نیست.</EmptyRow>
+              )}
             </div>
-          </Widget>
-        </div>
+            <div>
+              <p className="mb-2 text-xs text-muted-light">پرعلاقه‌مندی‌ترین</p>
+              {topFavorited.length > 0 ? (
+                <ul className="flex flex-col gap-2 text-sm">
+                  {topFavorited.map(({ article, count }) => (
+                    <li key={article.id} className="flex items-center justify-between gap-2">
+                      <Link
+                        href={`/admin/articles/${article.id}/edit`}
+                        className="truncate text-foreground hover:text-accent"
+                      >
+                        {article.title}
+                      </Link>
+                      <span className="shrink-0 text-xs text-muted">{count.toLocaleString("fa-IR")}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <EmptyRow>هنوز علاقه‌مندی‌ای نیست.</EmptyRow>
+              )}
+            </div>
+          </div>
+        </Widget>
 
-        <div className="grid gap-6 sm:grid-cols-2">
-          <Widget title="فعالیت اخیر">
-            {activity.length > 0 ? (
-              <ul className="flex flex-col gap-3 text-sm">
-                {activity.map((item, i) => (
-                  <li key={i} className="flex items-start justify-between gap-3">
-                    <span className="text-foreground">{item.node}</span>
-                    <time className="shrink-0 text-xs text-muted-light">{formatJalaliDate(item.at)}</time>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <EmptyRow>هنوز فعالیتی ثبت نشده.</EmptyRow>
-            )}
-          </Widget>
+        <Widget title="فعالیت اخیر">
+          {activity.length > 0 ? (
+            <ul className="flex flex-col gap-3 text-sm">
+              {activity.map((item, i) => (
+                <li key={i} className="flex items-start justify-between gap-3">
+                  <span className="text-foreground">{item.node}</span>
+                  <time className="shrink-0 text-xs text-muted-light">{formatJalaliDate(item.at)}</time>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyRow>هنوز فعالیتی ثبت نشده.</EmptyRow>
+          )}
+        </Widget>
 
-          <Widget title="نیازمند توجه">
-            {attentionItems.length > 0 ? (
-              <ul className="flex flex-col gap-3 text-sm">
-                {attentionItems.map((item, i) => (
-                  <li key={`${item.id}-${item.reason}-${i}`} className="flex items-center justify-between gap-3">
-                    <Link
-                      href={`/admin/articles/${item.id}/edit`}
-                      className="truncate text-foreground hover:text-accent"
-                    >
-                      {item.title}
-                    </Link>
-                    <span className="shrink-0 rounded-full bg-background-soft px-2 py-0.5 text-xs text-muted">
-                      {ATTENTION_REASON_LABELS[item.reason]}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <EmptyRow>چیزی نیازمند توجه نیست 🎉</EmptyRow>
-            )}
-          </Widget>
-        </div>
+        <Widget title="نیازمند توجه">
+          {attentionItems.length > 0 ? (
+            <ul className="flex flex-col gap-3 text-sm">
+              {attentionItems.map((item, i) => (
+                <li key={`${item.id}-${item.reason}-${i}`} className="flex items-center justify-between gap-3">
+                  <Link
+                    href={`/admin/articles/${item.id}/edit`}
+                    className="truncate text-foreground hover:text-accent"
+                  >
+                    {item.title}
+                  </Link>
+                  <span className="shrink-0 rounded-full bg-background-soft px-2 py-0.5 text-xs text-muted">
+                    {ATTENTION_REASON_LABELS[item.reason]}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <EmptyRow>چیزی نیازمند توجه نیست 🎉</EmptyRow>
+          )}
+        </Widget>
 
         {tagFrequency.length > 0 && (
           <Widget title="برچسب‌های پرکاربرد">
