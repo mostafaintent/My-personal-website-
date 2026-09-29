@@ -5,7 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/account";
+  const rawNext = searchParams.get("next");
+  // فقط مسیرهای داخلیِ خودِ سایت («/...») مجازن، نه یک URL کامل یا
+  // protocol-relative («//evil.com») — تا این پارامتر نتونه به open redirect تبدیل بشه.
+  const next = rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/account";
 
   if (code) {
     const supabase = await createClient();
